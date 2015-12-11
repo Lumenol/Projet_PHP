@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="style.css">
+		<title>Agent d'accueil</title>
+	</head>
+	
+	<body>
+		<fieldset>
+			<legend>Synthèse client / Gestion financière</legend>
+			<p>
+				<form method="post" action="traitement.php">
+					<label for="prenom">Prénom : </label>
+					<input name="prenom" id="prenom" required />
+				</form>
+			</p>
+			<p>
+				<form method="post" action="traitement.php">
+					<label for="prenom">Nom : </label>
+					<input name="nom" id="nom" required />
+				</form>
+			</p>
+			<p>
+				<input type="reset" value="Effacer le client de la base de données" />
+			</p>
+			<p>
+				<input type="submit" value="Afficher synthèse client" />
+			</p>
+			<p>
+				<input type="submit" value="Gestion financière du client" />
+			</p>
+		</fieldset>
+
+		<fieldset>
+			<legend>Gestion des rendez-vous</legend>
+			<p>
+				<form method="post" action="traitement.php">
+					<label for="prenom">Mécanicien: </label>
+					<input name="prenom" id="prenom" required />
+				</form>
+			</p>
+		</fieldset>
+		
+	</body>
