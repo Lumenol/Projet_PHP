@@ -1,0 +1,86 @@
+menus déroulants pour la page agents d'accueil
+id client = nom + prenom + dateNaissance
+
+
+//enregistrer un nouveau client (en vérifiant qu'il n'existe pas deja) avec un découvert (possiblement nul) (2 requetes nécessaires)
+insert into table client 
+($nom, $prenom, $adresse, $numTel, $dateN) 
+if not exists (select *
+	from client 
+	where nom = $nom
+	and prenom = $prenom
+	and adresse = $adresse
+	and numTel = $numTel
+	and dateNaiss = $dateN)
+
+et
+
+insert into table soldeclient
+($diffmax, $diff, $etat)
+where (select soldeclient.id
+	from client, soldeclient
+	where nom = $nom
+	and prenom = $prenom
+	and dateNaiss = $dateN
+	and soldeclient.id = client.id) 
+
+
+
+//modifier informations client
+update table client
+set (nom = $nvnom, prenom = $nvprenom, adresse = $nvadresse, numTel = $nvnumtel, dateNaiss = $nvdaten)
+where nom = $nom
+and prenom = $prenom 
+and dateNaiss = $dateN
+
+//payer la dernière intervention cash
+update table soldeclient
+set (etat = 'payé')
+where (nom = $nom)
+and (prenom = $prenom) 
+and (client.id = soldeclient.id)
+
+//supprimer un client
+delete from table client
+where nom = $nom
+and prenom = $prenom
+and dateNaiss = $dateN
+
+//selection des infos d'un client pour la synthèse
+select *
+from client
+where nom= $nom
+and prenom = $prenom
+and dateNaiss = $dateN
+
+//récupération emploi du temps mécanicien en rentrant son nom et son id
+select *
+from emploidutemps, mecanicien
+where mecanicien.identifiant = emploidutemps.idMeca
+and mecanicien.identifiant = $idenMeca
+and mecanicien.nom = $nomMeca
+
+
+//ajouter intervention (/!\ idInter pas en auto-incrément)
+insert into table intervention
+($idint, "", $prix, $mecan, $dateint)
+if not exists (select *
+	from intervention 
+	where date = $date
+	and mecanicien = $mecan)
+
+
+//récupération de la somme totale que le client a à payer
+select distinct (sum diffEnCours) as prixtotal
+from soldeclient, client, intervention
+where client.?id = soldeclient.id 
+and nom = $nom
+and prenom = $prenom
+and dateNaiss = $dateN
+and etat = 'à payer'
+and diffEnCours = prix
+
+
+
+
+
