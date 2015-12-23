@@ -139,7 +139,7 @@ function modifEmploye ($idemploye, $mdpemploye, $categorie, $nvidemploye, $nvmdp
 				set (identifiant = $nvidemploye, mdp = $nvmdpemploye, categorie=$nvcategorie)
 				where identifiant = $idemploye
 				and mdp = $mdpemploye
-				and categorie = $categorie"
+				and categorie = $categorie";
 	$resultat = $connexion->exec($requete);
 	$resultat=closeCursor();
 }
@@ -148,7 +148,16 @@ function supprEmploye ($idemploye, $mdpemploye){
 	$connexion=getConnect();
 	$requete="delete from table employe
 				where identifiant=$idemploye
-				and mpd = $mdpemploye"
+				and mpd = $mdpemploye";
+	$resultat = $connexion->exec($requete);
+	$resultat=closeCursor();
+}
+
+//////////////////////concernant les mecaniciens///////////////////////////////////////
+
+function ajouterFormation($idmeca, $dateforma){
+	$connexion=getConnect();
+	$requete="insert into table formation ($idmeca, $dateforma)";
 	$resultat = $connexion->exec($requete);
 	$resultat=closeCursor();
 }
