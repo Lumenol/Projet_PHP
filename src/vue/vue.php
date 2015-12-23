@@ -4,7 +4,7 @@ function affichageConnection() {
 			<form method="post" action="index.php">
 			<fieldset>
 			<legend>Connection</legend>
-			<p><label for="id">Identifiant</label><input type="text" name="id" id="id" required/></p>
+			<p><label for="id">Identifiant</label><input type="tel" pattern="[0-9]{5,20}" name="id" id="id" required/></p>
 			<p><label for="mdp">Mot de passe</label><input type="password" name="mdp" id="mdp" required/></p>
 			<p><input type="submit" name="connection" value="Connection"/></p>
 			</fieldset>
@@ -14,7 +14,7 @@ function affichageConnection() {
 function affichageDirecteur() {
 	$contenuAffichage = '<form method="post" action="index.php">
 						<fieldset>
-						<legend>Modifier identifiant</legend>
+						<legend>Ajouter employe</legend>
 			<p><label>Categorie :</label>
 			<select  name="categorie"/> 
 			<option value="agent" selected="selected">Agent</option>
@@ -23,7 +23,7 @@ function affichageDirecteur() {
 			</select></p>
 			<p><label>Login :</label><input type="text" name="id"/></p>
 			<p><label>Mot de passe :</label><input type="password" name="mdp" required/></p>
-			<p><input type="submit" value="Modifier" name="modifier_identifiant"/></p>
+			<p><input type="submit" value="Ajouter" name="creer_employe"/></p>
 			</fieldset>
 			</form>';
 	
@@ -63,4 +63,8 @@ function affichageDirecteur() {
 			</form>
 			';
 	require_once 'vue/gabarit.php';
+}
+
+function affichageErreur($msg){
+	$contenuAffichage=$msg;
 }

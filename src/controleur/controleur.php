@@ -28,11 +28,11 @@ function ctlChercherClient() {
 function ctlAffConnection() {
 	affichageConnection ();
 }
-function ctlModifierIdentifiant($categorie, $login, $mpd) {
+function ctlCreeEmploye($categorie, $login, $mpd) {
 	if (empty ( $categorie ) || empty ( $login ) || empty ( $mpd )) {
 		throw new Exception ( "categorie ou login ou mdp vide" );
 	} else {
-		// modification id
+		creerEmploye($login, $mpd, $categorie);
 	}
 	affichageDirecteur ();
 }
@@ -49,4 +49,8 @@ function ctlSupprimerPiece($pieces) {
 		supprimerPiece ( $val );
 	}
 	affichageDirecteur ();
+}
+
+function ctlErreur($msg){
+	affichageErreur($msg);
 }

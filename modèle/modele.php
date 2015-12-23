@@ -21,7 +21,7 @@ function ajouterClient($nom, $prenom, $adresse, $numTel, $dateN){
 				and numTel = $numTel
 				and dateNaiss = $dateN)";
 	$resultat=$connexion->exec($requete);
-	$resultat=closeCursor();
+	$resultat->closeCursor();
 }
 
 function ajouterSolde($idc, $diffMax, $diff, $etat){
@@ -32,7 +32,7 @@ function ajouterSolde($idc, $diffMax, $diff, $etat){
 					where client.id = $idc
 					and soldeclient.id = client.id) ";
 	$resultat=$connexion->exec($requete);
-	$resultat=closeCursor();
+	$resultat->closeCursor();
 }
 
 function modifClient ($idc, $nvnom, $nvprenom, $nvadresse, $nvnumtel, $nvdaten){
@@ -41,7 +41,7 @@ function modifClient ($idc, $nvnom, $nvprenom, $nvadresse, $nvnumtel, $nvdaten){
 			set (nom = $nvnom, prenom = $nvprenom, adresse = $nvadresse, numTel = $nvnumtel, dateNaiss = $nvdaten)
 			where id = $idc";
 	$resultat=$connexion->exec($requete);
-	$resultat=closeCursor();
+	$resultat->closeCursor();
 }
 
 function supprimerClient ($idc){
@@ -49,7 +49,7 @@ function supprimerClient ($idc){
 	$requete="delete from table client
 			where id = $idc";
 	$resultat=$connexion->exec($requete);
-	$resultat=closeCursor();
+	$resultat->closeCursor();
 }
 
 function recupEDT ($idenMeca, $nomMeca){
@@ -101,7 +101,7 @@ function creerIntervention($idinter, $typeinter, $matinter){
 							and type = $typeinter
 							and materielinter = $matinter)";
 	$resultat = $connexion->exec($requete);
-	$resultat=closeCursor();
+	$resultat->closeCursor();
 }
 
 function suppimerIntervention($idtypeinter){
@@ -109,7 +109,7 @@ function suppimerIntervention($idtypeinter){
 	$requete="delete from table typeintervention
 			where id=$idtypeinter";
 	$resultat = $connexion->exec($requete);
-	$resultat=closeCursor();
+	$resultat->closeCursor();
 }
 
 function modifIntervention($idtypeinter, $nvid, $nvtype, $nvmat){
@@ -118,7 +118,7 @@ function modifIntervention($idtypeinter, $nvid, $nvtype, $nvmat){
 			set (id = $nvid, type = $nvtype, materiel = $nvmat)
 			where id = $idtypeinter";
 	$resultat = $connexion->exec($requete);
-	$resultat=closeCursor();
+	$resultat->closeCursor();
 }
 
 function creerEmploye ($idemploye, $mdpemploye, $categorie){
@@ -130,7 +130,7 @@ function creerEmploye ($idemploye, $mdpemploye, $categorie){
 							and mdp = $mdpemploye
 							and categorie = $categorie)";
 	$resultat = $connexion->exec($requete);
-	$resultat=closeCursor();
+	$resultat->closeCursor();
 }
 
 function modifEmploye ($idemploye, $mdpemploye, $categorie, $nvidemploye, $nvmdpemploye, $nvcategorie){
@@ -141,7 +141,7 @@ function modifEmploye ($idemploye, $mdpemploye, $categorie, $nvidemploye, $nvmdp
 				and mdp = $mdpemploye
 				and categorie = $categorie";
 	$resultat = $connexion->exec($requete);
-	$resultat=closeCursor();
+	$resultat->closeCursor();
 }
 
 function supprEmploye ($idemploye, $mdpemploye){
@@ -150,7 +150,7 @@ function supprEmploye ($idemploye, $mdpemploye){
 				where identifiant=$idemploye
 				and mpd = $mdpemploye";
 	$resultat = $connexion->exec($requete);
-	$resultat=closeCursor();
+	$resultat->closeCursor();
 }
 
 //////////////////////concernant les mecaniciens///////////////////////////////////////
@@ -159,5 +159,5 @@ function ajouterFormation($idmeca, $dateforma){
 	$connexion=getConnect();
 	$requete="insert into table formation ($idmeca, $dateforma)";
 	$resultat = $connexion->exec($requete);
-	$resultat=closeCursor();
+	$resultat->closeCursor();
 }
