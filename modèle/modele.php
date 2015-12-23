@@ -22,38 +22,70 @@ function ajouterClient($nom, $prenom, $adresse, $numTel, $dateN){
 	$resultat=closeCursor();
 }
 
-function ajouterSolde($nom, $prenom, $dateN, $diffMax, $diff, $etat){
+function ajouterSolde($idc, $diffMax, $diff, $etat){
 	$connexion=getConnect();
 	$requete="insert into table soldeclient ($diffmax, $diff, $etat)
 			where (select soldeclient.id
 					from client, soldeclient
-					where nom = $nom
-					and prenom = $prenom
-					and dateNaiss = $dateN
+					where client.id = $idc
 					and soldeclient.id = client.id) ";
 	$resultat=$connexion->exec($requete);
 	$resultat=closeCursor();
 }
 
-function modifClient ($nom, $prenom, $dateN, $nvnom, $nvprenom, $nvadresse, $nvnumtel, $nvdaten){
+function modifClient ($idc, $nvnom, $nvprenom, $nvadresse, $nvnumtel, $nvdaten){
 	$connexion=getConnect();
 	$requete="update table client
 			set (nom = $nvnom, prenom = $nvprenom, adresse = $nvadresse, numTel = $nvnumtel, dateNaiss = $nvdaten)
-			where nom = $nom
-			and prenom = $prenom 
-			and dateNaiss = $dateN";
+			where id = $idc";
 	$resultat=$connexion->exec($requete);
 	$resultat=closeCursor();
 }
 
-function supprimerClient ($nom, $prenom, $dateN){
+function supprimerClient ($idc){
 	$connexion=getConnect();
 	$requete="delete from table client
-			where nom = $nom
-			and prenom = $prenom
-			and dateNaiss = $dateN";
+			where id = $idc";
 	$resultat=$connexion->exec($requete);
 	$resultat=closeCursor();
+}
+
+function recupEDT ($idenMeca, $nomMeca){
+	$connexion=getConnect();
+	$requete="select *
+			from emploidutemps, mecanicien
+			where mecanicien.identifiant = emploidutemps.idMeca
+			and mecanicien.identifiant = $idenMeca
+			and mecanicien.nom = $nomMeca";
+	$resultat = $connexion->query($requete);
+	$resultat->setFetchMode(PDO::FETCH_OBJ);
+	$edt=$resultat->fetchall();
+	$resultat = closeCursor();
+}
+
+function syntheseClient($idc){
+	$connexion=getConnect();
+	$requete="select *
+			from client, soldeclient, intervention
+			where client.id = $idc
+			and client.id = soldeclient.id
+			and soldeclient.intervention = intervention.idInter";
+	$resultat = $connexion->query($requete);
+	$resultat->setFetchMode(PDO::FETCH_OBJ);
+	$client=$resultat->fetchall();
+	$resultat = closeCursor();
+}
+
+function trouverIDclient ($nom, $dateN){
+	$connexion=getConnect();
+	$requete="select id
+				from client
+				where nom=$nom
+				and dateNaiss=$dateN";
+	$resultat = $connexion->query($requete);
+	$resultat->setFetchMode(PDO::FETCH_OBJ);
+	$idclient=$resultat->fetchall();
+	$resultat = closeCursor();
 }
 
 
