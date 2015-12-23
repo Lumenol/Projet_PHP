@@ -8,6 +8,8 @@ function getConnect(){
 	return $connexion;
 }
 
+////////////////////////////concernant les agents d'accueil//////////////////////////////////////
+
 function ajouterClient($nom, $prenom, $adresse, $numTel, $dateN){
 	$connexion=getConnect();
 	$requete="insert into table client ($nom, $prenom, $adresse, $numTel, $dateN) 
@@ -88,4 +90,65 @@ function trouverIDclient ($nom, $dateN){
 	$resultat = closeCursor();
 }
 
+/////////////////////////////////concernant le directeur/////////////////////////////////4
 
+function creerIntervention($idinter, $typeinter, $matinter){
+	$connexion=getConnect();
+	$requete="insert into table typeintervention ($idinter, $typeinter, $matinter)
+			if not exists (select * 
+							from typeintervention
+							where idInter=$idinter
+							and type = $typeinter
+							and materielinter = $matinter)";
+	$resultat = $connexion->exec($requete);
+	$resultat=closeCursor();
+}
+
+function suppimerIntervention($idtypeinter){
+	$connexion=getConnect();
+	$requete="delete from table typeintervention
+			where id=$idtypeinter";
+	$resultat = $connexion->exec($requete);
+	$resultat=closeCursor();
+}
+
+function modifIntervention($idtypeinter, $nvid, $nvtype, $nvmat){
+	$connexion=getConnect();
+	$requete="update table typeintervention
+			set (id = $nvid, type = $nvtype, materiel = $nvmat)
+			where id = $idtypeinter";
+	$resultat = $connexion->exec($requete);
+	$resultat=closeCursor();
+}
+
+function creerEmploye ($idemploye, $mdpemploye, $categorie){
+	$connexion=getConnect();
+	$requete="insert into table employe ($idemploye, $mdpemploye, $categorie)
+			if not exists (select *
+							from employe
+							where identifiant = $idemploye
+							and mdp = $mdpemploye
+							and categorie = $categorie)";
+	$resultat = $connexion->exec($requete);
+	$resultat=closeCursor();
+}
+
+function modifEmploye ($idemploye, $mdpemploye, $categorie, $nvidemploye, $nvmdpemploye, $nvcategorie){
+	$connexion=getConnect();
+	$requete="update table employe
+				set (identifiant = $nvidemploye, mdp = $nvmdpemploye, categorie=$nvcategorie)
+				where identifiant = $idemploye
+				and mdp = $mdpemploye
+				and categorie = $categorie"
+	$resultat = $connexion->exec($requete);
+	$resultat=closeCursor();
+}
+
+function supprEmploye ($idemploye, $mdpemploye){
+	$connexion=getConnect();
+	$requete="delete from table employe
+				where identifiant=$idemploye
+				and mpd = $mdpemploye"
+	$resultat = $connexion->exec($requete);
+	$resultat=closeCursor();
+}
