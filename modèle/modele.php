@@ -12,7 +12,8 @@ function getConnect(){
 
 function ajouterClient($nom, $prenom, $adresse, $numTel, $dateN){
 	$connexion=getConnect();
-	$requete="insert into table client ($nom, $prenom, $adresse, $numTel, $dateN) 
+	$requete="insert into table client 
+			values ($nom, $prenom, $adresse, $numTel, $dateN) 
 			if not exists (select *
 				from client 
 				where nom = $nom
@@ -26,7 +27,8 @@ function ajouterClient($nom, $prenom, $adresse, $numTel, $dateN){
 
 function ajouterSolde($idc, $diffMax, $diff, $etat){
 	$connexion=getConnect();
-	$requete="insert into table soldeclient ($diffmax, $diff, $etat)
+	$requete="insert into table soldeclient 
+			values ($diffmax, $diff, $etat)
 			where (select soldeclient.id
 					from client, soldeclient
 					where client.id = $idc
@@ -58,7 +60,7 @@ function recupEDT ($idenMeca, $nomMeca){
 			from emploidutemps, mecanicien
 			where mecanicien.edt = emploidutemps.idMeca
 			and mecanicien.identifiant = $idenMeca
-			and mecanicien.nom = $nomMeca
+			and mecanicien.nom = $nomMeca;
 			order by jour, intervention ";
 	$resultat = $connexion->query($requete);
 	$resultat->setFetchMode(PDO::FETCH_OBJ);
@@ -95,7 +97,8 @@ function trouverIDclient ($nom, $dateN){
 
 function creerIntervention($idinter, $typeinter, $matinter){
 	$connexion=getConnect();
-	$requete="insert into table typeintervention ($idinter, $typeinter, $matinter)
+	$requete="insert into table typeintervention 
+			values ($idinter, $typeinter, $matinter)
 			if not exists (select * 
 							from typeintervention
 							where idInter=$idinter
@@ -124,7 +127,8 @@ function modifIntervention($idtypeinter, $nvid, $nvtype, $nvmat){
 
 function creerEmploye ($idemploye, $mdpemploye, $categorie){
 	$connexion=getConnect();
-	$requete="insert into table employe ($idemploye, $mdpemploye, $categorie)
+	$requete="insert into table employe 
+			values ($idemploye, $mdpemploye, $categorie)
 			if not exists (select *
 							from employe
 							where identifiant = $idemploye
@@ -158,7 +162,7 @@ function supprEmploye ($idemploye, $mdpemploye){
 
 function ajouterFormation($idmeca, $dateforma){
 	$connexion=getConnect();
-	$requete="insert into table formation ($idmeca, $dateforma)";
+	$requete="insert into table formation values ($idmeca, $dateforma)";
 	$resultat = $connexion->exec($requete);
 	$resultat=closeCursor();
 }
