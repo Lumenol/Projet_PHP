@@ -50,3 +50,7 @@ function ctlSupprimerPiece($pieces) {
 	}
 	affichageDirecteur ();
 }
+
+function ctlErreur($msg){
+	affichageErreur($msg);
+}

@@ -64,3 +64,8 @@ function affichageDirecteur() {
 			';
 	require_once 'vue/gabarit.php';
 }
+
+function affichageErreur($msg){
+	$contenuAffichage=$msg;
+	require_once 'vue/gabarit.php';
+}

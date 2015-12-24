@@ -8,52 +8,41 @@ function getConnect(){
 	return $connexion;
 }
 
-function ajouterClient($nom, $prenom, $adresse, $numTel, $dateN){
+function ajouterClient($nom, $prenom, $adresse, $numTel, $dateN,$credit=0){
 	$connexion=getConnect();
-	$requete="insert into table client ($nom, $prenom, $adresse, $numTel, $dateN) 
-			if not exists (select *
-				from client 
-				where nom = $nom
-				and prenom = $prenom
-				and adresse = $adresse
-				and numTel = $numTel
-				and dateNaiss = $dateN)";
+	$requete="insert into client VALUES('','$nom', '$prenom', '$adresse', '$numTel', '$dateN','$credit')"; 
 	$resultat=$connexion->exec($requete);
 	$resultat=closeCursor();
 }
 
-function ajouterSolde($nom, $prenom, $dateN, $diffMax, $diff, $etat){
-	$connexion=getConnect();
-	$requete="insert into table soldeclient ($diffmax, $diff, $etat)
-			where (select soldeclient.id
-					from client, soldeclient
-					where nom = $nom
-					and prenom = $prenom
-					and dateNaiss = $dateN
-					and soldeclient.id = client.id) ";
-	$resultat=$connexion->exec($requete);
-	$resultat=closeCursor();
-}
-
-function modifClient ($nom, $prenom, $dateN, $nvnom, $nvprenom, $nvadresse, $nvnumtel, $nvdaten){
+function modifClient ($id,$nom, $prenom, $adresse, $numTel, $dateN,$credit){
 	$connexion=getConnect();
 	$requete="update table client
-			set (nom = $nvnom, prenom = $nvprenom, adresse = $nvadresse, numTel = $nvnumtel, dateNaiss = $nvdaten)
-			where nom = $nom
-			and prenom = $prenom 
-			and dateNaiss = $dateN";
+			set nom = '$nom', prenom = '$prenom', adresse = '$adresse', numTel = '$numTel', dateNaiss = '$dateN' , credit='$credit'
+			where id='$id'";
 	$resultat=$connexion->exec($requete);
-	$resultat=closeCursor();
+	$resultat->closeCursor();
 }
 
-function supprimerClient ($nom, $prenom, $dateN){
+function supprimerClient ($id){
 	$connexion=getConnect();
-	$requete="delete from table client
-			where nom = $nom
-			and prenom = $prenom
-			and dateNaiss = $dateN";
+	$requete="delete table,facture,intervention from facture,intervention,client
+			where table.id='$id'
+			and facture.id_client = table.id
+			and intervention.id_cleint = table.id";
 	$resultat=$connexion->exec($requete);
 	$resultat=closeCursor();
 }
 
+function getCategorie($id, $mdp){
+	$connexion=getConnect();
+	$requete="select categorie from employe
+	where id='$id'
+	and mpd = '$mdp'";
+	$resultat=$connexion->query($requete);
+	$resultat->setFetchMode(PDO::FETCH_OBJ);
+	$categorie=$resultat->fetch();
+	$resultat->closeCursor();
+	return $categorie;
+}
 

@@ -14,7 +14,7 @@ try {
 	}elseif (isset($_POST['ajouter_piece'])){
 		$libele=$_POST['libele'];
 		ctlAjouterPiece($libele);
-	}elseif ($_POST['supprimer_piece']){
+	}elseif (isset($_POST['supprimer_piece'])){
 		$pieces=$_POST['pieces_sup'];
 		ctlSupprimerPiece($pieces);
 	}
