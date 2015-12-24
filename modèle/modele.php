@@ -14,7 +14,7 @@ function ajouterClient($nom, $prenom, $adresse, $numTel, $dateN){
 	$connexion=getConnect();
 	$requete="insert into table client 
 			values ($nom, $prenom, $adresse, $numTel, $dateN) 
-			if not exists (select *
+			where not exists (select *
 				from client 
 				where nom = $nom
 				and prenom = $prenom
@@ -99,7 +99,7 @@ function creerIntervention($idinter, $typeinter, $matinter){
 	$connexion=getConnect();
 	$requete="insert into table typeintervention 
 			values ($idinter, $typeinter, $matinter)
-			if not exists (select * 
+			where not exists (select * 
 							from typeintervention
 							where idInter=$idinter
 							and type = $typeinter
@@ -129,7 +129,7 @@ function creerEmploye ($idemploye, $mdpemploye, $categorie){
 	$connexion=getConnect();
 	$requete="insert into table employe 
 			values ($idemploye, $mdpemploye, $categorie)
-			if not exists (select *
+			where not exists (select *
 							from employe
 							where identifiant = $idemploye
 							and mdp = $mdpemploye
