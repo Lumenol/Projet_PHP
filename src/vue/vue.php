@@ -35,14 +35,18 @@ function affichageDirecteur() {
 	foreach ($employes as $employe){
 		$contenuAffichage.='<p><label>Categorie :</label>
 			<select  name="categorie[]" required/> 
-			<option value="agent"'.($employe->categorie='agent') ? 'selected="selected"'.' >Agent</option>
-			<option value="mecanicien" '.($employe->categorie='mecanicien') ? 'selected="selected"':''.' >Mecanicien</option>
-			<option value="directeur" '.($employe->categorie='directeur') ? 'selected="selected"':''.' >Directeur</option>
+			<option value="agent" '.(($employe->categorie='agent') ? 'selected="selected"':'').' >Agent</option>
+			<option value="mecanicien" '.(($employe->categorie='mecanicien') ? 'selected="selected"':'').' >Mecanicien</option>
+			<option value="directeur" '.(($employe->categorie='directeur') ? 'selected="selected"':'').' >Directeur</option>
 			</select>
 			<label>Login :</label><input type="text" name="id[]" value="'.$employe->id.'" required/>
 				<label>Mot de passe :</label><input type="text" name="mdp[]" value="'.$employe->mdp.'" required/>	
 					</p>';
 	}
+	
+	$contenuAffichage.='<p><input type="submit" value="Modifier" name="modifier_employe"/></p>
+			</fieldset>
+			</form>';
 	
 	
 	$contenuAffichage .= '<form method="post" action="index.php">
@@ -58,7 +62,7 @@ function affichageDirecteur() {
 			<fieldset>
 			<legend>Supprimer pièce</legend>';
 	
-	$pieces = getPieces();
+	/*$pieces = getPieces();
 	
 	foreach ( $pieces as $piece ) {
 		$contenuAffichage .= '<p><input type="checkbox" name="pieces_sup[]" value="' . $piece->idProd . '"/><label>' . $piece->libele . '</label></p>';
@@ -79,8 +83,8 @@ function affichageDirecteur() {
 	$contenuAffichage .= '<p><input type="submit" name="modifier_piece"/></p>
 			</fieldset>
 			</form>
-			';
-	require_once 'vue/gabarit.php';
+			';*/
+	require_once 'gabarit.php';
 }
 
 function affichageErreur($msg){

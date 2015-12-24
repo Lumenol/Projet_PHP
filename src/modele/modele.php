@@ -39,9 +39,9 @@ function getCategorie($id, $mdp) {
 	and mdp = '$mdp'";
 	$resultat = $connexion->query ( $requete );
 	$resultat->setFetchMode ( PDO::FETCH_OBJ );
-	$categorie = $resultat->fetch ();
+	$categorie = $resultat->fetchAll();
 	$resultat->closeCursor ();
-	return $categorie->categorie;
+	return $categorie;
 }
 
 // /////directeur
@@ -101,10 +101,14 @@ function ajouterMecanicien($nom){
 
 function getEmployes(){
 	$connexion = getConnect ();
-	$requete = "select * from employe;
+	$requete = "select * from employe";
 	$resultat = $connexion->query ( $requete );
 	$resultat->setFetchMode ( PDO::FETCH_OBJ );
 	$employes = $resultat->fetchAll();
 	$resultat->closeCursor();
 	return $employes;
+}
+
+function ajouterEmploye($id,$mdp){
+	
 }
