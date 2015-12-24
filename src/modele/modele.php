@@ -129,8 +129,7 @@ function creerEmploye ($idemploye, $mdpemploye, $categorie){
 							where identifiant = $idemploye
 							and mdp = $mdpemploye
 							and categorie = $categorie)";
-	$resultat = $connexion->exec($requete);
-	$resultat->closeCursor();
+	$connexion->exec($requete);
 }
 
 function modifEmploye ($idemploye, $mdpemploye, $categorie, $nvidemploye, $nvmdpemploye, $nvcategorie){
