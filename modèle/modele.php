@@ -54,11 +54,12 @@ function supprimerClient ($idc){
 
 function recupEDT ($idenMeca, $nomMeca){
 	$connexion=getConnect();
-	$requete="select *
+	$requete="select jour, idMeca, intervention, formation
 			from emploidutemps, mecanicien
-			where mecanicien.identifiant = emploidutemps.idMeca
+			where mecanicien.edt = emploidutemps.idMeca
 			and mecanicien.identifiant = $idenMeca
-			and mecanicien.nom = $nomMeca";
+			and mecanicien.nom = $nomMeca
+			order by jour, intervention ";
 	$resultat = $connexion->query($requete);
 	$resultat->setFetchMode(PDO::FETCH_OBJ);
 	$edt=$resultat->fetchall();
