@@ -1,3 +1,3 @@
 <?php
-require_once '../src/modele/modele.php';
-creerEmploye("12345", "12342", "directeur");
+require_once '../modèle/modele.php';
+creerEmploye(9999, "aze", 2);
