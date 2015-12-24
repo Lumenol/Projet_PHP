@@ -14,18 +14,36 @@ function affichageConnection() {
 function affichageDirecteur() {
 	$contenuAffichage = '<form method="post" action="index.php">
 						<fieldset>
-						<legend>Modifier identifiant</legend>
+						<legend>Crée employe</legend>
 			<p><label>Categorie :</label>
-			<select  name="categorie"/> 
+			<select  name="categorie" required/> 
 			<option value="agent" selected="selected">Agent</option>
 			<option value="mecanicien">Mecanicien</option>
 			<option value="directeur">Directeur</option>
 			</select></p>
-			<p><label>Login :</label><input type="text" name="id"/></p>
-			<p><label>Mot de passe :</label><input type="password" name="mdp" required/></p>
-			<p><input type="submit" value="Modifier" name="modifier_identifiant"/></p>
+			<p><label>Login :</label><input type="text" name="id"  required/></p>
+			<p><label>Mot de passe :</label><input type="text" name="mdp" required/></p>
+			<p><input type="submit" value="Ajouter" name="cree_employe"/></p>
 			</fieldset>
 			</form>';
+	
+	$contenuAffichage.='<form method="post" action="index.php">
+						<fieldset>
+						<legend>Modifier identifiant</legend>';
+			
+			$employes=getEmployes();
+	foreach ($employes as $employe){
+		$contenuAffichage.='<p><label>Categorie :</label>
+			<select  name="categorie[]" required/> 
+			<option value="agent"'.($employe->categorie='agent') ? 'selected="selected"'.' >Agent</option>
+			<option value="mecanicien" '.($employe->categorie='mecanicien') ? 'selected="selected"':''.' >Mecanicien</option>
+			<option value="directeur" '.($employe->categorie='directeur') ? 'selected="selected"':''.' >Directeur</option>
+			</select>
+			<label>Login :</label><input type="text" name="id[]" value="'.$employe->id.'" required/>
+				<label>Mot de passe :</label><input type="text" name="mdp[]" value="'.$employe->mdp.'" required/>	
+					</p>';
+	}
+	
 	
 	$contenuAffichage .= '<form method="post" action="index.php">
 			<fieldset>

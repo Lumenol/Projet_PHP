@@ -28,6 +28,9 @@ function supprimerClient($id) {
 	$requete="update facture,intervention set facture.id_client='NULL',intervention.id_client='NULL' where facture.id_client='$id' and facture.id_intervention=intervention.id";
 	$connexion->exec( $requete );
 }
+
+
+
 // /////connection
 function getCategorie($id, $mdp) {
 	$connexion = getConnect ();
@@ -88,4 +91,20 @@ function modifierTypeIntervention($id,$type,$prix) {
 	$connexion = getConnect ();
 	$requete="update type_intervention set type='$type',prix='$prix' where id='$id'";
 	$connexion->exec( $requete );
+}
+
+function ajouterMecanicien($nom){
+	$connexion = getConnect ();
+	$requete = "insert into mecanicien VALUES('','$nom')";
+	$connexion->exec ( $requete );
+}
+
+function getEmployes(){
+	$connexion = getConnect ();
+	$requete = "select * from employe;
+	$resultat = $connexion->query ( $requete );
+	$resultat->setFetchMode ( PDO::FETCH_OBJ );
+	$employes = $resultat->fetchAll();
+	$resultat->closeCursor();
+	return $employes;
 }
