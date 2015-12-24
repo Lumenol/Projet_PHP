@@ -8,6 +8,15 @@ function getConnect(){
 	return $connexion;
 }
 
+function afficheEmployes(){
+	$connexion=getConnect();
+	$requete="select *
+			from employe
+			order by categorie";
+	$resultat=$connexion->query($requete);
+	$resultat->closeCursor();
+}
+
 ////////////////////////////concernant les agents d'accueil//////////////////////////////////////
 
 function ajouterClient($nom, $prenom, $adresse, $numTel, $dateN){
@@ -16,34 +25,30 @@ function ajouterClient($nom, $prenom, $adresse, $numTel, $dateN){
 			values ($nom, $prenom, $adresse, $numTel, $dateN) 
 			where not exists (select *
 				from client 
-				where nom = $nom
-				and prenom = $prenom
-				and adresse = $adresse
+				where nom = '$nom'
+				and prenom = '$prenom'
+				and adresse = '$adresse'
 				and numTel = $numTel
 				and dateNaiss = $dateN)";
 	$resultat=$connexion->exec($requete);
-	$resultat=closeCursor();
+	$resultat->closeCursor();
 }
 
 function ajouterSolde($idc, $diffMax, $diff, $etat){
 	$connexion=getConnect();
 	$requete="insert into table soldeclient 
-			values ($diffmax, $diff, $etat)
-			where (select soldeclient.id
-					from client, soldeclient
-					where client.id = $idc
-					and soldeclient.id = client.id) ";
+			values ($diffmax, $diff, $etat, $idc)";
 	$resultat=$connexion->exec($requete);
-	$resultat=closeCursor();
+	$resultat->closeCursor();
 }
 
 function modifClient ($idc, $nvnom, $nvprenom, $nvadresse, $nvnumtel, $nvdaten){
 	$connexion=getConnect();
 	$requete="update table client
-			set (nom = $nvnom, prenom = $nvprenom, adresse = $nvadresse, numTel = $nvnumtel, dateNaiss = $nvdaten)
+			set (nom = '$nvnom', prenom = '$nvprenom', adresse = '$nvadresse', numTel = $nvnumtel, dateNaiss = $nvdaten)
 			where id = $idc";
 	$resultat=$connexion->exec($requete);
-	$resultat=closeCursor();
+	$resultat->closeCursor();
 }
 
 function supprimerClient ($idc){
@@ -51,7 +56,7 @@ function supprimerClient ($idc){
 	$requete="delete from table client
 			where id = $idc";
 	$resultat=$connexion->exec($requete);
-	$resultat=closeCursor();
+	$resultat->closeCursor();
 }
 
 function recupEDT ($idenMeca, $nomMeca){
@@ -60,12 +65,12 @@ function recupEDT ($idenMeca, $nomMeca){
 			from emploidutemps, mecanicien
 			where mecanicien.edt = emploidutemps.idMeca
 			and mecanicien.identifiant = $idenMeca
-			and mecanicien.nom = $nomMeca;
+			and mecanicien.nom = '$nomMeca';
 			order by jour, intervention ";
 	$resultat = $connexion->query($requete);
 	$resultat->setFetchMode(PDO::FETCH_OBJ);
 	$edt=$resultat->fetchall();
-	$resultat = closeCursor();
+	$resultat->closeCursor();
 }
 
 function syntheseClient($idc){
@@ -78,19 +83,19 @@ function syntheseClient($idc){
 	$resultat = $connexion->query($requete);
 	$resultat->setFetchMode(PDO::FETCH_OBJ);
 	$client=$resultat->fetchall();
-	$resultat = closeCursor();
+	$resultat->closeCursor();
 }
 
 function trouverIDclient ($nom, $dateN){
 	$connexion=getConnect();
 	$requete="select id
 				from client
-				where nom=$nom
+				where nom='$nom'
 				and dateNaiss=$dateN";
 	$resultat = $connexion->query($requete);
 	$resultat->setFetchMode(PDO::FETCH_OBJ);
 	$idclient=$resultat->fetchall();
-	$resultat = closeCursor();
+	$resultat->closeCursor();
 }
 
 /////////////////////////////////concernant le directeur/////////////////////////////////4
@@ -98,14 +103,9 @@ function trouverIDclient ($nom, $dateN){
 function creerIntervention($idinter, $typeinter, $matinter){
 	$connexion=getConnect();
 	$requete="insert into table typeintervention 
-			values ($idinter, $typeinter, $matinter)
-			where not exists (select * 
-							from typeintervention
-							where idInter=$idinter
-							and type = $typeinter
-							and materielinter = $matinter)";
+			values ($idinter, '$typeinter', '$matinter')";
 	$resultat = $connexion->exec($requete);
-	$resultat=closeCursor();
+	$resultat->closeCursor();
 }
 
 function suppimerIntervention($idtypeinter){
@@ -113,7 +113,7 @@ function suppimerIntervention($idtypeinter){
 	$requete="delete from table typeintervention
 			where id=$idtypeinter";
 	$resultat = $connexion->exec($requete);
-	$resultat=closeCursor();
+	$resultat->closeCursor();
 }
 
 function modifIntervention($idtypeinter, $nvid, $nvtype, $nvmat){
@@ -122,40 +122,60 @@ function modifIntervention($idtypeinter, $nvid, $nvtype, $nvmat){
 			set (id = $nvid, type = $nvtype, materiel = $nvmat)
 			where id = $idtypeinter";
 	$resultat = $connexion->exec($requete);
-	$resultat=closeCursor();
+	$resultat->closeCursor();
 }
 
 function creerEmploye ($idemploye, $mdpemploye, $categorie){
 	$connexion=getConnect();
 	$requete="insert into table employe 
-			values ($idemploye, $mdpemploye, $categorie)
-			where not exists (select *
-							from employe
-							where identifiant = $idemploye
-							and mdp = $mdpemploye
-							and categorie = $categorie)";
+			values ($idemploye, '$mdpemploye', '$categorie')";
 	$resultat = $connexion->exec($requete);
-	$resultat=closeCursor();
+	$resultat->closeCursor();
 }
 
 function modifEmploye ($idemploye, $mdpemploye, $categorie, $nvidemploye, $nvmdpemploye, $nvcategorie){
 	$connexion=getConnect();
 	$requete="update table employe
-				set (identifiant = $nvidemploye, mdp = $nvmdpemploye, categorie=$nvcategorie)
+				set (identifiant = $nvidemploye, mdp = '$nvmdpemploye', categorie='$nvcategorie')
 				where identifiant = $idemploye
-				and mdp = $mdpemploye
-				and categorie = $categorie";
+				and mdp = '$mdpemploye'
+				and categorie = '$categorie'";
 	$resultat = $connexion->exec($requete);
-	$resultat=closeCursor();
+	$resultat->closeCursor();
 }
 
 function supprEmploye ($idemploye, $mdpemploye){
 	$connexion=getConnect();
 	$requete="delete from table employe
 				where identifiant=$idemploye
-				and mpd = $mdpemploye";
+				and mpd = '$mdpemploye'";
 	$resultat = $connexion->exec($requete);
-	$resultat=closeCursor();
+	$resultat->closeCursor();
+}
+
+function creerPiece ($libelle, $idprod){
+	$connexion=getConnect();
+	$requete="insert into materiel
+				values ('$libelle', $idprod)";
+	$resultat = $connexion->exec($requete);
+	$resultat->closeCursor();
+}
+
+function modifPiece ($nvlibelle, $nvidprod, $idprod){
+	$connexion=getConnect();
+	$requete="update materiel
+				set (libelle='$nvlibelle', idProd=$nvidprod)
+				where idProd=$idprod";
+	$resultat = $connexion->exec($requete);
+	$resultat->closeCursor();
+}
+
+function supprimerPiece ($idprod){
+	$connexion=getConnect();
+	$requete="delete from materiel
+				where idprod=$idprod";
+	$resultat = $connexion->exec($requete);
+	$resultat->closeCursor();
 }
 
 //////////////////////concernant les mecaniciens///////////////////////////////////////
@@ -164,5 +184,5 @@ function ajouterFormation($idmeca, $dateforma){
 	$connexion=getConnect();
 	$requete="insert into table formation values ($idmeca, $dateforma)";
 	$resultat = $connexion->exec($requete);
-	$resultat=closeCursor();
+	$resultat->closeCursor();
 }
