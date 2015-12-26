@@ -18,4 +18,12 @@ require_once '../src/vue/vue.php';
 // 	echo $key;
 // }
 
-getProduit(13, 4);
+//getProduit(13, 4);
+// $act=activiteMecanicien(2, '2015/12/25');
+// foreach ($act as $value) {
+// 	foreach ($value as $k => $v) {
+// 		echo $k.'='.$v.'</br>';
+// 	}
+// }
+
+ajouterFormation(2, "2015/12/26 16:00:00");
