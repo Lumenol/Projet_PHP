@@ -7,7 +7,7 @@ try {
 		$login = $_POST ['id'];
 		$mdp = $_POST ['mdp'];
 		ctlConnection ( $login, $mdp );
-		/////////////DIRECTEUR///////////////////////
+		// ///////////DIRECTEUR///////////////////////
 		// employe
 	} elseif (isset ( $_POST ['cree_employe'] )) {
 		$categorie = $_POST ['categorie'];
@@ -53,17 +53,23 @@ elseif (isset ( $_POST ['cree_type_intervention'] )) {
 	} elseif (isset ( $_POST ['supprimer_mecanicien'] )) {
 		$supprimers = isset ( $_POST ['supprimer'] ) ? $_POST ['supprimer'] : array ();
 		ctlSupprimerMecaniciens ( $supprimers );
+	}	// ////////////////////////////////////////////////////////MECANICIEN
+	elseif (isset ( $_POST ['consulter_employe_du_temps_mecanicien'] )) {
+		$idMecanicien = $_POST ['idMecanicien'];
+		$jour = $_POST ['jour'];
+		ctlconsulterEDT ( $idMecanicien, $jour );
+	} elseif (isset ( $_POST ['consulter_intervention_mecanicien'] )) {
+		$jour = $_POST ['jour'];
+		$intervention=$_POST['intervention'];
+		ctlConsulterInterventionMecanicien($jour,$intervention);
+	} elseif (isset ( $_POST ['bloquer_formation_mecanicien'] )) {
+		$jour = $_POST ['jour'];
+		$date=$_POST['date'];
+		$idMecanicien=$_POST['idMecanicien'];
+		$heure=$_POST['heure'];
+		ctlBloquerFormation($date,$heure,$jour,$idMecanicien);
 	} 
-//////////////////////////////////////////////////////////MECANICIEN
-elseif (isset($_POST['consulter_employe_du_temps_mecanicien'])){
-	$idMecanicien=$_POST['idMecanicien'];
-	$jour=$_POST['jour'];
-	consulterEDT($idMecanicien, $jour);
-}
 
-	
-	
-	
 	else {
 		ctlAffConnection ();
 	}

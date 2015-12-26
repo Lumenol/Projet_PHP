@@ -47,28 +47,54 @@ function ctlAffichageDirecteur() {
 	}
 	affichageDirecteur ( $employes, $mecaniciens, $pieces, $typeIntervention, $produits );
 }
-function ctlAffichageMecanicien($edt = array(),$jour=NULL) {
+function ctlAffichageMecanicien($edt =NULL,$jour=NULL,$idMecanicien=NULL,$intervention=NULL,$client=NULL,$impayer=NULL,$interventions=NULL) {
 	$mecaniciens = getMecanicien ();
-	affichageMecanicien ( $mecaniciens, $edt,$jour);
+	affichageMecanicien ($mecaniciens, $edt,$jour,$idMecanicien,$intervention,$client,$impayer,$interventions);
 }
 function ctlAffichageAgent() {
 	affichageAgent ();
 }
 
 // ///////////////////////MECANICIEN///////////////////////////////////////
-function consulterEDT($idMecanicien, $jour) {
+function ctlConsulterEDT($idMecanicien, $jour) {
+	$edt=ctlGetEDT($idMecanicien, $jour);
+	ctlAffichageMecanicien ( $edt,$jour,$idMecanicien );
+}
+
+function ctlGetEDT($idMecanicien,$jour){
 	$jour = date_create_from_format ( 'Y/m/d', $jour );
 	$semaine = date_format ( $jour, 'W' );
 	$annee = date_format ( $jour, 'Y' );
-	$edt = edtMecanicien ( $idMecanicien, $semaine-1, $annee );	
-	ctlAffichageMecanicien ( $edt,$jour );
+	return edtMecanicien ( $idMecanicien, $semaine-1, $annee );
 }
+
+function ctlConsulterInterventionMecanicien($jour,$idIntervention){
+	$intervention=getIntervention($idIntervention);	
+	$client=getInformationClient($intervention[0]->id_client);
+	$impayer=getSommeImpayer($intervention[0]->id_client);
+	$interventions=getInterventionClient($intervention[0]->id_client);
+	$idMecanicien=$intervention[0]->id_mecanicien;
+	$edt=ctlGetEDT($idMecanicien, $jour);
+
+	ctlAffichageMecanicien($edt,$jour,$idMecanicien,$intervention,$client,$impayer,$interventions);
+}
+
+function ctlBloquerFormation($date,$heure,$jour,$idMecanicien){
+	$date.=' '.$heure.':00:00';
+	if(empty(isDisponible($idMecanicien, $date))){
+	$id=ajouterFormation($idMecanicien, $date);
+	ajouterFormationEdt($idMecanicien, $id, $date);
+	}
+	$edt=ctlGetEDT($idMecanicien, $jour);
+	ctlAffichageMecanicien($edt,$jour,$idMecanicien);
+}
+
 // //////////////////////////////////////////////////////////////////////
 // ///////////////////////DIRECTEUR//////////////////////////////////////
 // employe
 function ctlModifierEmploye($lastLogin, $categorie, $login, $mdp) {
 	if (empty ( $lastLogin ) || empty ( $categorie ) || empty ( $login ) || empty ( $mdp )) {
-		throw new Exception ( "login précedent categorie ou login ou mdp vide" );
+		throw new Exception ( "login prï¿½cedent categorie ou login ou mdp vide" );
 	} else {
 		modifierEmploye ( $lastLogin, $login, $mdp, $categorie );
 	}

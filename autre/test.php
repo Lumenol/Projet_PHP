@@ -26,4 +26,10 @@ require_once '../src/vue/vue.php';
 // 	}
 // }
 
-ajouterFormation(2, "2015/12/26 16:00:00");
+//ajouterFormation(2, "2015/12/26 16:00:00");
+$impayer = getInterventionClient(1);
+foreach ($impayer as $i){
+	foreach ($i as $key => $value) {
+		echo $key.'='.$value;
+	}
+}

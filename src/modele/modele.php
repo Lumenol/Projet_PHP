@@ -27,6 +27,46 @@ function supprimerClient($id) {
 	$connexion->exec ( $requete );
 }
 
+function getInformationClient($id){
+	$connexion = getConnect ();
+	$requete = "select * from client where id='$id'";
+	$resultat = $connexion->query ( $requete );
+	$resultat->setFetchMode ( PDO::FETCH_OBJ );
+	$client = $resultat->fetchAll ();
+	$resultat->closeCursor ();
+	return $client;
+}
+
+function getSommeImpayer($idClient){
+	$connexion = getConnect ();
+	$requete = "select sum(type_intervention.prix) as impayer from type_intervention,intervention,facture where intervention.id_client='$idClient' and facture.id_intervention=intervention.id and facture.etat='en différé' and type_intervention.id=intervention.type";
+	$resultat = $connexion->query ( $requete );
+	$resultat->setFetchMode ( PDO::FETCH_OBJ );
+	$impayer = $resultat->fetchAll ();
+	$resultat->closeCursor ();
+	return $impayer;
+}
+
+function getInterventionClient($id){
+	$connexion = getConnect ();
+	$requete = "select intervention.horaire,intervention.id,intervention.id_client,facture.etat,type_intervention.type,type_intervention.prix,mecanicien.nom from mecanicien,intervention,facture,type_intervention where intervention.id=facture.id_intervention and type_intervention.id=intervention.type and mecanicien.id=intervention.id_mecanicien and intervention.id_client='$id'";
+	$resultat = $connexion->query ( $requete );
+	$resultat->setFetchMode ( PDO::FETCH_OBJ );
+	$interventions = $resultat->fetchAll ();
+	$resultat->closeCursor ();
+	return $interventions;
+}
+
+function getIntervention($id){
+	$connexion = getConnect ();
+	$requete = "select intervention.id_client,intervention.id_mecanicien,type_intervention.type,intervention.horaire,materiel.libele,mecanicien.nom,type_intervention.prix,client.nom from client,mecanicien,type_intervention,intervention,produit,materiel where intervention.id='$id' and intervention.type=produit.id_produit and materiel.id=produit.id_materiel and type_intervention.id=intervention.type and mecanicien.id=intervention.id_mecanicien and client.id=intervention.id_client";
+	$resultat = $connexion->query ( $requete );
+	$resultat->setFetchMode ( PDO::FETCH_OBJ );
+	$interventions = $resultat->fetchAll ();
+	$resultat->closeCursor ();
+	return $interventions;
+}
+
 // /////connection
 function getCategorie($id, $mdp) {
 	$connexion = getConnect ();
@@ -177,7 +217,7 @@ function supprimerEmploye($id) {
 
 function edtMecanicien($idMecanicien,$semaine,$annee){
 	$connexion = getConnect ();
-	$requete = "select * from edt where id_mecanicien='$idMecanicien' and YEAR(horaire)='$annee' and WEEK(horaire)='$semaine' ";
+	$requete = "select * from edt where id_mecanicien='$idMecanicien' and YEAR(horaire)='$annee' and WEEK(horaire)='$semaine' order by horaire asc";
 	$resultat = $connexion->query ( $requete );
 	$resultat->setFetchMode ( PDO::FETCH_OBJ );
 	$edt = $resultat->fetchAll ();
@@ -187,13 +227,23 @@ function edtMecanicien($idMecanicien,$semaine,$annee){
 
 function ajouterFormation($idMecanicien,$horaire){
 	$connexion = getConnect ();
-	$requete = "insert  into formation values('',$idMecanicien','$horaire')";
+	$requete = "insert ignore into formation values('','$idMecanicien','$horaire')";
 	$connexion->exec ( $requete );
 	return $connexion->lastInsertId();
 }
 
 function ajouterFormationEdt($idMecanicien,$idFormation,$horaire){
 	$connexion = getConnect ();
-	$requete = "insert  into edt values('','formation',$idMecanicien','$horaire',NULL,'$idFormation')";
+	$requete = "insert ignore into edt values('','formation','$idMecanicien','$horaire',NULL,'$idFormation')";
 	$connexion->exec ( $requete );
+}
+
+function isDisponible($idMecanicien,$horaire){
+	$connexion = getConnect ();
+	$requete = "select * from edt where id_mecanicien='$idMecanicien' and horaire='$horaire'";
+	$resultat = $connexion->query ( $requete );
+	$resultat->setFetchMode ( PDO::FETCH_OBJ );
+	$edt = $resultat->fetchAll ();
+	$resultat->closeCursor ();
+	return $edt;
 }
