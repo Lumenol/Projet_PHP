@@ -21,7 +21,7 @@ try {
 		ctlModifierEmployes ( $categorie, $login, $mdp );
 	} elseif (isset ( $_POST ['supprimer_employe'] )) {
 		$supprimer = isset ( $_POST ['supprimer'] ) ? $_POST ['supprimer'] : array ();
-		ctlSupprimerEmploye ( $supprimer );
+		ctlSupprimerEmployes ( $supprimer );
 		// piece
 	} elseif (isset ( $_POST ['ajouter_piece'] )) {
 		$libele = $_POST ['libele'];
@@ -69,8 +69,37 @@ elseif (isset ( $_POST ['cree_type_intervention'] )) {
 		$heure=$_POST['heure'];
 		ctlBloquerFormation($date,$heure,$jour,$idMecanicien);
 	} 
-
-	else {
+	/////////////////////AGENT
+	elseif (isset($_POST['cree_client'])){
+		$dateN=$_POST['naissance'];
+		$nom=$_POST['nom'];
+		$prenom=$_POST['prenom'];
+		$adresse=$_POST['adresse'];
+		$num=$_POST['num'];
+		$credit=$_POST['credit'];
+		ctlAjouterClient($nom, $prenom, $dateN, $adresse, $num, $credit);
+	}elseif (isset($_POST['modifier_client'])){
+		$dateN=$_POST['naissance'];
+		$nom=$_POST['nom'];
+		$prenom=$_POST['prenom'];
+		$adresse=$_POST['adresse'];
+		$numTel=$_POST['num'];
+		$credit=$_POST['credit'];
+		$id=$_POST['idClient'];
+		ctlModifierClient($id,$nom, $prenom, $dateN, $adresse, $numTel, $credit);
+	}elseif (isset($_POST['chercher_client'])){
+		$dateN=$_POST['naissance'];
+		$nom=$_POST['nom'];
+		$prenom=$_POST['prenom'];
+		$jour=$_POST['jour'];
+		$idMecanicien=['idMecanicien'];
+		ctlChercherClient($nom, $prenom, $dateN,$jour,$idMecanicien);
+	}elseif (isset ( $_POST ['consulter_employe_du_temps_mecanicien_agent'] )) {
+		$idMecanicien = $_POST ['idMecanicien'];
+		$jour = $_POST ['jour'];
+		$idClient=isset($_POST['idClient'])?$_POST['idClient']:null;
+		ctlconsulterEDT ( $idMecanicien, $jour,TRUE,$idClient);
+	}else {
 		ctlAffConnection ();
 	}
 } catch ( Exception $e ) {

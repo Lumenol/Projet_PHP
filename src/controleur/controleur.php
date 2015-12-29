@@ -51,18 +51,55 @@ function ctlAffichageMecanicien($edt =NULL,$jour=NULL,$idMecanicien=NULL,$interv
 	$mecaniciens = getMecanicien ();
 	affichageMecanicien ($mecaniciens, $edt,$jour,$idMecanicien,$intervention,$client,$impayer,$interventions);
 }
-function ctlAffichageAgent() {
-	affichageAgent ();
+function ctlAffichageAgent($client=NULL,$idMecanicien=NULL,$jour=NULL,$edt=null) {
+	$jour=empty($jour)?date('Y-m-d'):$jour;
+	$clients=getClients();
+	$mecaniciens=getMecanicien();
+	affichageAgent ($clients,$client,$mecaniciens,$idMecanicien,$jour,$edt);
+}
+///////////////////////////AGENT/////////////////////
+function ctlAjouterClient($nom,$prenom,$dateN,$adresse,$num,$credit){
+	$d=explode('-', $dateN);
+	if(checkdate($d[1], $d[2], $d[0])){
+		ajouterClient($nom, $prenom, $adresse, $num, $dateN,$credit);
+	}
+	ctlAffichageAgent();
+}
+
+function ctlChercherClient($nom,$prenom,$dateN,$jour=null,$idMecanicien=null){
+	$client=chercherClient($nom,$prenom,$dateN);
+	$edt=null;
+	if(!empty($idMecanicien)){
+		$edt=ctlGetEDT($idMecanicien, $jour);
+	}
+	ctlAffichageAgent($client,$idMecanicien,$jour,$edt);
+}
+
+function ctlModifierClient($id,$nom,$prenom,$dateN,$adresse,$num,$credit){
+	$d=explode('-', $dateN);
+	if(checkdate($d[1], $d[2], $d[0])){
+		modifClient($id, $nom, $prenom, $adresse, $num, $dateN, $credit);
+	}
+	$client=getInformationClient($id);
+	ctlAffichageAgent($client);
 }
 
 // ///////////////////////MECANICIEN///////////////////////////////////////
-function ctlConsulterEDT($idMecanicien, $jour) {
+function ctlConsulterEDT($idMecanicien, $jour,$agent=FALSE,$idClient=NULL) {
 	$edt=ctlGetEDT($idMecanicien, $jour);
-	ctlAffichageMecanicien ( $edt,$jour,$idMecanicien );
+	if($agent){
+		if(!empty($idClient)){
+			$idClient=getInformationClient($idClient);
+		}
+		ctlAffichageAgent($idClient,$idMecanicien,$jour,$edt);
+	}else{
+		ctlAffichageMecanicien ( $edt,$jour,$idMecanicien );
+	}
+	
 }
 
 function ctlGetEDT($idMecanicien,$jour){
-	$jour = date_create_from_format ( 'Y/m/d', $jour );
+	$jour = date_create_from_format ( 'Y-m-d', $jour );
 	$semaine = date_format ( $jour, 'W' );
 	$annee = date_format ( $jour, 'Y' );
 	return edtMecanicien ( $idMecanicien, $semaine-1, $annee );
@@ -80,8 +117,10 @@ function ctlConsulterInterventionMecanicien($jour,$idIntervention){
 }
 
 function ctlBloquerFormation($date,$heure,$jour,$idMecanicien){
+	$d=explode('-', $date);
 	$date.=' '.$heure.':00:00';
-	if(empty(isDisponible($idMecanicien, $date))){
+	
+	if(checkdate($d[1], $d[2],$d[0] ) && empty(isDisponible($idMecanicien, $date))){
 	$id=ajouterFormation($idMecanicien, $date);
 	ajouterFormationEdt($idMecanicien, $id, $date);
 	}
@@ -233,6 +272,8 @@ function ctlSupprimerMecaniciens($supprimers) {
 	}
 	ctlAffichageDirecteur ();
 }
+
+
 // /////////////////////////////////////////////////////////////////////////
 // erreur
 function ctlErreur($msg) {

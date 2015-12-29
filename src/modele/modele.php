@@ -7,7 +7,7 @@ function getConnect() {
 	$connexion->query ( 'SET NAMES UTF8' );
 	return $connexion;
 }
-// /////////////////////agent
+// /////////////////////AGENT
 function ajouterClient($nom, $prenom, $adresse, $numTel, $dateN, $credit = 0) {
 	$connexion = getConnect ();
 	$requete = "insert into client VALUES('','$nom', '$prenom', '$adresse', '$numTel', '$dateN','$credit')";
@@ -15,8 +15,8 @@ function ajouterClient($nom, $prenom, $adresse, $numTel, $dateN, $credit = 0) {
 }
 function modifClient($id, $nom, $prenom, $adresse, $numTel, $dateN, $credit) {
 	$connexion = getConnect ();
-	$requete = "update table client
-			set nom = '$nom', prenom = '$prenom', adresse = '$adresse', numTel = '$numTel', dateNaiss = '$dateN' , credit='$credit'
+	$requete = "update client
+			set nom = '$nom', prenom = '$prenom', adresse = '$adresse', num_tel = '$numTel', date_naissance = '$dateN' , credit='$credit'
 			where id='$id'";
 	$connexion->exec ( $requete );
 }
@@ -35,6 +35,26 @@ function getInformationClient($id){
 	$client = $resultat->fetchAll ();
 	$resultat->closeCursor ();
 	return $client;
+}
+
+function chercherClient($nom,$prenom,$dateN){
+	$connexion = getConnect ();
+	$requete = "select * from client where nom='$nom' and prenom='$prenom' and date_naissance='$dateN'";
+	$resultat = $connexion->query ( $requete );
+	$resultat->setFetchMode ( PDO::FETCH_OBJ );
+	$client = $resultat->fetchAll ();
+	$resultat->closeCursor ();
+	return $client;
+}
+
+function getClients(){
+	$connexion = getConnect ();
+	$requete = "select * from client order by nom";
+	$resultat = $connexion->query ( $requete );
+	$resultat->setFetchMode ( PDO::FETCH_OBJ );
+	$clients = $resultat->fetchAll ();
+	$resultat->closeCursor ();
+	return $clients;
 }
 
 function getSommeImpayer($idClient){
@@ -67,6 +87,19 @@ function getIntervention($id){
 	return $interventions;
 }
 
+function ajouterIntervention($idMecanicien,$horaire,$idClient,$type){
+	$connexion = getConnect ();
+	$requete = "insert ignore into intervention values('','$type','$idMecanicien','$horaire','$idClient')";
+	$connexion->exec ( $requete );
+	return $connexion->lastInsertId();
+}
+
+function ajouterInterventionEdt($idMecanicien,$idIntervention,$horaire){
+	$connexion = getConnect ();
+	$requete = "insert ignore into edt values('','intervention','$idMecanicien','$horaire','$idIntervention',NULL)";
+	$connexion->exec ( $requete );
+}
+
 // /////connection
 function getCategorie($id, $mdp) {
 	$connexion = getConnect ();
@@ -85,7 +118,7 @@ function getCategorie($id, $mdp) {
 // materiel
 function getPieces() {
 	$connexion = getConnect ();
-	$requete = "select * from materiel";
+	$requete = "select * from materiel order by libele";
 	$resultat = $connexion->query ( $requete );
 	$resultat->setFetchMode ( PDO::FETCH_OBJ );
 	$pieces = $resultat->fetchAll ();
@@ -121,7 +154,7 @@ function supprimerProduit($id_produit, $id_materiel) {
 // typeIntervention
 function getTypeIntervention() {
 	$connexion = getConnect ();
-	$requete = "select * from type_intervention";
+	$requete = "select * from type_intervention order by type";
 	$resultat = $connexion->query ( $requete );
 	$resultat->setFetchMode ( PDO::FETCH_OBJ );
 	$interventions = $resultat->fetchAll ();
@@ -181,7 +214,7 @@ function supprimerMecanicien($id) {
 }
 function getMecanicien() {
 	$connexion = getConnect ();
-	$requete = "select * from mecanicien";
+	$requete = "select * from mecanicien order by nom";
 	$resultat = $connexion->query ( $requete );
 	$resultat->setFetchMode ( PDO::FETCH_OBJ );
 	$mecanicien = $resultat->fetchAll ();
@@ -191,7 +224,7 @@ function getMecanicien() {
 // employe
 function getEmployes() {
 	$connexion = getConnect ();
-	$requete = "select * from employe";
+	$requete = "select * from employe order by categorie";
 	$resultat = $connexion->query ( $requete );
 	$resultat->setFetchMode ( PDO::FETCH_OBJ );
 	$employes = $resultat->fetchAll ();
@@ -210,7 +243,7 @@ function modifierEmploye($idP, $id, $mdp, $categorie) {
 }
 function supprimerEmploye($id) {
 	$connexion = getConnect ();
-	$requete = "delete employe where id='$id'";
+	$requete = "delete from employe where id='$id'";
 	$connexion->exec ( $requete );
 }
 ////////////////MECANICIEN///////////////////
