@@ -51,11 +51,16 @@ function ctlAffichageMecanicien($edt =NULL,$jour=NULL,$idMecanicien=NULL,$interv
 	$mecaniciens = getMecanicien ();
 	affichageMecanicien ($mecaniciens, $edt,$jour,$idMecanicien,$intervention,$client,$impayer,$interventions);
 }
-function ctlAffichageAgent($client=NULL,$idMecanicien=NULL,$jour=NULL,$edt=null) {
+function ctlAffichageAgent($client=NULL,$idMecanicien=NULL,$jour=NULL) {
 	$jour=empty($jour)?date('Y-m-d'):$jour;
 	$clients=getClients();
 	$mecaniciens=getMecanicien();
-	affichageAgent ($clients,$client,$mecaniciens,$idMecanicien,$jour,$edt);
+	$types=getTypeIntervention();
+	$edt=(!empty($idMecanicien)?ctlGetEDT($idMecanicien, $jour):null);
+	if(!empty($client)){
+		$client=getInformationClient($client);
+	}
+	affichageAgent ($clients,$client,$mecaniciens,$idMecanicien,$jour,$edt,$types);
 }
 ///////////////////////////AGENT/////////////////////
 function ctlAjouterClient($nom,$prenom,$dateN,$adresse,$num,$credit){
@@ -68,34 +73,30 @@ function ctlAjouterClient($nom,$prenom,$dateN,$adresse,$num,$credit){
 
 function ctlChercherClient($nom,$prenom,$dateN,$jour=null,$idMecanicien=null){
 	$client=chercherClient($nom,$prenom,$dateN);
-	$edt=null;
-	if(!empty($idMecanicien)){
-		$edt=ctlGetEDT($idMecanicien, $jour);
-	}
-	ctlAffichageAgent($client,$idMecanicien,$jour,$edt);
+	$client=empty($client)?null:$client[0]->id;
+	ctlAffichageAgent($client,$idMecanicien,$jour);
 }
 
-function ctlModifierClient($id,$nom,$prenom,$dateN,$adresse,$num,$credit){
+function ctlModifierClient($id,$nom,$prenom,$dateN,$adresse,$num,$credit,$jour,$idMecanicien){
 	$d=explode('-', $dateN);
 	if(checkdate($d[1], $d[2], $d[0])){
 		modifClient($id, $nom, $prenom, $adresse, $num, $dateN, $credit);
 	}
-	$client=getInformationClient($id);
-	ctlAffichageAgent($client);
+	ctlAffichageAgent($client,$idMecanicien,$jour);
 }
-
-// ///////////////////////MECANICIEN///////////////////////////////////////
-function ctlConsulterEDT($idMecanicien, $jour,$agent=FALSE,$idClient=NULL) {
-	$edt=ctlGetEDT($idMecanicien, $jour);
-	if($agent){
-		if(!empty($idClient)){
-			$idClient=getInformationClient($idClient);
-		}
-		ctlAffichageAgent($idClient,$idMecanicien,$jour,$edt);
-	}else{
-		ctlAffichageMecanicien ( $edt,$jour,$idMecanicien );
+function ctlPlaniffierIntervention($idClient,$type,$idMecanicien,$date,$heure,$jour){
+	$d=explode('-', $date);
+	$horaire=$date.' '.$heure;
+	if(checkdate($d[1], $d[2], $d[0]) and empty(isDisponible($idMecanicien, $horaire))){
+		$id=ajouterIntervention($idMecanicien, $horaire, $idClient, $type);
+		ajouterInterventionEdt($idMecanicien, $id, $horaire);
 	}
-	
+	ctlAffichageAgent($idClient,$idMecanicien,$jour);
+}
+// ///////////////////////MECANICIEN///////////////////////////////////////
+function ctlConsulterEDT($idMecanicien, $jour) {
+	$edt=(!empty($idMecanicien)?ctlGetEDT($idMecanicien, $jour):null);
+		ctlAffichageMecanicien ( $edt,$jour,$idMecanicien );	
 }
 
 function ctlGetEDT($idMecanicien,$jour){

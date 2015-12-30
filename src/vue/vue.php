@@ -214,16 +214,19 @@ function affSupprimerTypeIntervention($interventions) {
 	return $contenuAffichage;
 }
 // ///////////////////////////////AGENT
-function affichageAgent($clients, $client,$mecaniciens,$idMecanicien,$jour,$edt) {
+function affichageAgent($clients, $client=null,$mecaniciens=null,$idMecanicien=null,$jour=null,$edt=null,$types) {
 	$contenuAffichage = affDeconexion ();
 	$contenuAffichage .= affAjouterClient ();
 	$contenuAffichage.=affChoixEDT($mecaniciens, $idMecanicien, $jour,TRUE,!empty($client)?$client[0]->id:null);
 	if(isset($edt)){
 		$contenuAffichage.=affEDT($edt, $jour,true);
 	}
-	$contenuAffichage .= affRechercheClient ( $clients );
+	$contenuAffichage .= affRechercheClient ( $clients,$idMecanicien,$jour );
 	if (! empty ( $client )) {
-		$contenuAffichage .= affModifierClient ( $client [0] );
+		$contenuAffichage .= affModifierClient ( $client [0],$idMecanicien,$jour );
+	}
+	if(!empty($client) and !empty($idMecanicien)){
+		$contenuAffichage.=affPlanificationIntervention($types, $idMecanicien, $client[0]->id, $jour);
 	}
 	require_once 'gabarit.php';
 }
@@ -231,20 +234,39 @@ function affAjouterClient() {
 	return '<form method="post" action="index.php">
 						<fieldset>
 						<legend>Crée client</legend>
-			<p><label>Nom :</label><input type="text" name="nom"  required/><label>Prénom :</label><input type="text" name="prenom"  required/><label>Date de naissance :</label><input type="text" name="naissance" placeholder="aaaa-mm-jj"  pattern="^[0-9]{4}-[0-9]{2}-[0-9]{2}$" required /><label>Adresse :</label><input type="text" name="adresse"  required/><label>Numéro de téléphone :</label><input type="tel" name="num" pattern="^0[0-9]{9}$" required/><label>Crédit :</label><input type="number" name="credit" min="0" step="0.01"  required/></p>
+			<p><label>Nom :</label><input type="text" name="nom"  required/><label>Prénom :</label><input type="text" name="prenom"  required/><label>Date de naissance :</label><input type="text" name="naissance" placeholder="aaaa-mm-jj"  pattern="^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$" required /><label>Adresse :</label><input type="text" name="adresse"  required/><label>Numéro de téléphone :</label><input type="tel" name="num" pattern="^0[0-9]{9}$" required/><label>Crédit :</label><input type="number" name="credit" min="0" step="0.01"  required/></p>
 			<p><input type="submit" value="Ajouter" name="cree_client"/></p>
 			</fieldset>
 			</form>';
 }
-function affModifierClient($client) {
+function affModifierClient($client,$idMecanicien=null,$jour=null) {
 	$contenuAffichage = '<form method="post" action="index.php">
 			<fieldset>
 			<legend>Modifier client</legend>
 			<input type="hidden" name="idClient" value="' . $client->id . '" />
-			<p><label>Nom :</label><input type="text" name="nom" value="' . $client->nom . '"  required/><label>Prénom :</label><input type="text" name="prenom" value="' . $client->prenom . '" required/><label>Date de naissance :</label><input type="text" name="naissance" value="' . $client->date_naissance . '" placeholder="aaaa-mm-jj"  pattern="^[0-9]{4}-[0-9]{2}-[0-9]{2}$" required /><label>Adresse :</label><input type="text" name="adresse" value="' . $client->adresse . '" required/><label>Numéro de téléphone :</label><input type="tel" name="num" pattern="^0[0-9]{9}$" value="' . $client->num_tel . '" required/><label>Crédit :</label><input type="number" name="credit" min="0" step="0.01" value="' . $client->credit . '" required/></p>
+					<input type="hidden" value="'.$idMecanicien.'" name ="idMecanicien"/>
+					<input type="hidden" value="'.$jour.'" name="jour" />
+			<p><label>Nom :</label><input type="text" name="nom" value="' . $client->nom . '"  required/><label>Prénom :</label><input type="text" name="prenom" value="' . $client->prenom . '" required/><label>Date de naissance :</label><input type="text" name="naissance" value="' . $client->date_naissance . '" placeholder="aaaa-mm-jj"  pattern="^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$" required /><label>Adresse :</label><input type="text" name="adresse" value="' . $client->adresse . '" required/><label>Numéro de téléphone :</label><input type="tel" name="num" pattern="^[0-9]{10}$" value="' . $client->num_tel . '" required/><label>Crédit :</label><input type="number" name="credit" min="0" step="0.01" value="' . $client->credit . '" required/></p>
 			<p><input type="submit" value="Modifier" name="modifier_client"/></p>
 					</fieldset>
 			</form>';
+	return $contenuAffichage;
+}
+function affPlanificationIntervention($types,$idMecanicien,$idClient,$jour){
+	$contenuAffichage='<form method="post" action="index.php">
+			<fieldset>
+			<legend>Programmer une intervention</legend>
+			<input type="hidden" name="idMecanicien" value="'.$idMecanicien.'"/>
+			<input type="hidden" name="idClient" value="'.$idClient.'"/>
+					<input type="hidden" name="jour" value="'.$jour.'"/>
+	<p><label>Type d\'intervention :</label><select name="type" ';
+	foreach ( $types as $type ) {
+		$contenuAffichage .= '<option value="' . $type->id . '" >' . $type->type . '</option>';
+	}
+	$contenuAffichage .= '</select>
+			<label>Date :</label><input type="text" name="date" placeholder="aaaa-mm-jj"  pattern="^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$" required/><label>Heure :</label><input type="number" min="0" 
+															23" step="1" name="heure" required></p>
+			<p><input type="submit" value="Programmer" name="planifier_intervention"/></p>';
 	return $contenuAffichage;
 }
 function affRechercheClient($clients,$idMecanicien=null,$jour=null) {
@@ -258,7 +280,7 @@ function affRechercheClient($clients,$idMecanicien=null,$jour=null) {
 				<label>Prénom :</label>
 			<input list="prenom" name="prenom" required/>
 				<label>Date de naissance :</label>
-			<input type="text" name="naissance" placeholder="aaaa-mm-jj"  pattern="^[0-9]{4}-[0-9]{2}-[0-9]{2}$" required/></p>
+			<input type="text" name="naissance" placeholder="aaaa-mm-jj"  pattern="^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$" required/></p>
 				<datalist id="nom">';
 	
 	foreach ( $clients as $client ) {
@@ -296,7 +318,7 @@ function affChoixEDT($mecaniciens, $id, $jour,$agent=FALSE,$idClient=null) {
 	$contenuAffichage = '<form method="post" action="index.php">
 						<fieldset>
 						<legend>Consulter emploie du temps</legend>
-			<input type="hidden" value="'.$idClient.' name="idClient"/>
+			<input type="hidden" value="'.$idClient.'" name="idClient"/>
 			<p><label>Nom du mecanicien :</label>
 			<select  name="idMecanicien" required/>';
 	
@@ -304,7 +326,7 @@ function affChoixEDT($mecaniciens, $id, $jour,$agent=FALSE,$idClient=null) {
 		$contenuAffichage .= '<option value="' . $mecanicien->id . '" ' . (($mecanicien->id == $id) ? 'selected="selected"' : '') . '>' . $mecanicien->nom . '</option>';
 	}
 	$contenuAffichage .= '</select>
-			<label>Jour :</label><input type="text" name="jour" placeholder="aaaa-mm-jj" value="' . (! empty ( $jour ) ? date_format ( $jour, 'Y-m-d' ) : date ( 'Y-m-d' )) . '" pattern="^[0-9]{4}-[0-1][0-9]-[0-2][0-9]$" required/></p>
+			<label>Jour :</label><input type="text" name="jour" placeholder="aaaa-mm-jj" value="' . (! empty ( $jour ) ? date_format ( $jour, 'Y-m-d' ) : date ( 'Y-m-d' )) . '" pattern="^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$" required/></p>
 			<p><input type="submit" value="Consulter" name="consulter_employe_du_temps_mecanicien'.($agent?'_agent':'').'"/></p>
 			</fieldset>
 			</form>
@@ -315,7 +337,8 @@ function affReservationFormation($idMecanicien, $jour) {
 	$contenueAffichage = '<form method="post" action="index.php">
 									<input type="hidden" name="idMecanicien" value="' . $idMecanicien . '"/>
 													<input type="hidden" name="jour" value="' . $jour . '"/>
-															<p><label>Jour :</label><input type="text" name="date" placeholder="aaaa-mm-jj"  pattern="^[0-9]{4}-[0-9]{2}-[0-9]{2}$" required/> <label>Heure :</label><input type="number" min="0" max="23" step="1" name="heure" required></p>
+															<p><label>Jour :</label><input type="text" name="date" placeholder="aaaa-mm-jj"  pattern="^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$" required/> <label>Heure :</label><input type="number" min="0" 
+															23" step="1" name="heure" required></p>
 		
 							<input type="submit" value="Formation" name="bloquer_formation_mecanicien"/></form>';
 	return $contenueAffichage;
@@ -339,7 +362,7 @@ function affEDT($edt, $jour,$agent=FALSE) {
 				if (date ( 'Y-m-d H', strtotime ( $edt [$tache]->horaire ) ) == date ( 'Y-m-d H', strtotime ( "$rel days $h hours", $jour_ ) )) {
 					switch ($edt [$tache]->type) {
 						case 'intervention' :
-							if(agent){
+							if($agent){
 								$contenuAffichage.="Intervention";
 							}else{
 							$contenuAffichage .= '<form method="post" action="index.php">
