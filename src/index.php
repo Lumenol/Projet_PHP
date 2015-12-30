@@ -111,7 +111,20 @@ elseif (isset ( $_POST ['cree_type_intervention'] )) {
 			$heure=$_POST['heure'];
 			ctlPlaniffierIntervention($idClient,$type,$idMecanicien,$date,$heure,$jour);
 		
-	}else {
+	}elseif (isset($_POST['payer_intervention'])){
+		$idClient=$_POST['idClient'];
+		$jour=$_POST['jour'];
+		$idMecanicien=$_POST['idMecanicien'];
+		$payer=$_POST['paye'];
+		ctlPayerInterventions($payer, $idMecanicien, $idClient, $jour);
+	}elseif (isset($_POST['differe_intervention'])){
+		$idClient=$_POST['idClient'];
+		$jour=$_POST['jour'];
+		$idMecanicien=$_POST['idMecanicien'];
+		$payer=$_POST['paye'];
+		
+	}
+	else {
 		ctlAffConnection ();
 	}
 } catch ( Exception $e ) {

@@ -2,7 +2,7 @@
 <html lang="fr">
 	<head>
 		<meta charset="utf-8">
-<!-- 		<link rel="stylesheet" href="vue/style.css"> -->
+		<link rel="stylesheet" href="vue/style.css">
 		<title>Site</title>
 	</head>
 	<body>

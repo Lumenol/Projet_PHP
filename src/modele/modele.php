@@ -56,6 +56,33 @@ function getClients(){
 	$resultat->closeCursor ();
 	return $clients;
 }
+function getInterventionClientEtat($id,$etat){
+	$connexion = getConnect ();
+	$requete = "select intervention.horaire,intervention.id,intervention.id_client,facture.etat,type_intervention.type,type_intervention.prix,mecanicien.nom from mecanicien,intervention,facture,type_intervention where intervention.id=facture.id_intervention and type_intervention.id=intervention.type and mecanicien.id=intervention.id_mecanicien and intervention.id_client='$id' and facture.etat='$etat' order by intervention.horaire";
+	$resultat = $connexion->query ( $requete );
+	$resultat->setFetchMode ( PDO::FETCH_OBJ );
+	$interventions = $resultat->fetchAll ();
+	$resultat->closeCursor ();
+	return $interventions;
+}
+
+function payerIntervention($id){
+	$connexion = getConnect ();
+	$requete = "update facture set etat='payée' where id_intervention='$id'";
+	$connexion->exec ( $requete );
+}
+
+function differeFacture($id){
+	$connexion = getConnect ();
+	$requete = "update facture set etat='en différé' where id_intervention='$id'";
+	$connexion->exec ( $requete );
+}
+
+function nouvelleFacture($id_intervention,$id_client){
+	$connexion = getConnect ();
+	$requete = "insert into facture values($id_client,$id_intervention,default)";
+	$connexion->exec ( $requete );
+}
 
 function getSommeImpayer($idClient){
 	$connexion = getConnect ();

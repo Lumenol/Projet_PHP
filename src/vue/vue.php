@@ -214,19 +214,27 @@ function affSupprimerTypeIntervention($interventions) {
 	return $contenuAffichage;
 }
 // ///////////////////////////////AGENT
-function affichageAgent($clients, $client=null,$mecaniciens=null,$idMecanicien=null,$jour=null,$edt=null,$types) {
+function affichageAgent($clients, $client = null, $mecaniciens = null, $idMecanicien = null, $jour = null, $edt = null, $types, $factures = NULL, $attente = NULL, $piece = null, $impaye = null, $payer = NULL) {
 	$contenuAffichage = affDeconexion ();
 	$contenuAffichage .= affAjouterClient ();
-	$contenuAffichage.=affChoixEDT($mecaniciens, $idMecanicien, $jour,TRUE,!empty($client)?$client[0]->id:null);
-	if(isset($edt)){
-		$contenuAffichage.=affEDT($edt, $jour,true);
+	$contenuAffichage .= affChoixEDT ( $mecaniciens, $idMecanicien, $jour, TRUE, ! empty ( $client ) ? $client [0]->id : null );
+	if (isset ( $edt )) {
+		$contenuAffichage .= affEDT ( $edt, $jour, true );
 	}
-	$contenuAffichage .= affRechercheClient ( $clients,$idMecanicien,$jour );
+	$contenuAffichage .= affRechercheClient ( $clients, $idMecanicien, $jour );
 	if (! empty ( $client )) {
-		$contenuAffichage .= affModifierClient ( $client [0],$idMecanicien,$jour );
+		$contenuAffichage .= affModifierClient ( $client [0], $idMecanicien, $jour );
+		$contenuAffichage .= affSyntheseClient ( $client, $impaye, $payer );
+		
+		if (! empty ( $factures )) {
+			$contenuAffichage .= affPayerIntervention ( $factures, $jour, $idMecanicien, $client [0]->id );
+		}
 	}
-	if(!empty($client) and !empty($idMecanicien)){
-		$contenuAffichage.=affPlanificationIntervention($types, $idMecanicien, $client[0]->id, $jour);
+	if (! empty ( $client ) and ! empty ( $idMecanicien )) {
+		$contenuAffichage .= affPlanificationIntervention ( $types, $idMecanicien, $client [0]->id, $jour );
+	}
+	if (! empty ( $attente )) {
+		$contenuAffichage .= affInterventionEnAttente ( $attente, $jour, $idMecanicien, $client [0]->id, $client [0]->credit - $impaye [0]->impayer, $piece );
 	}
 	require_once 'gabarit.php';
 }
@@ -239,43 +247,44 @@ function affAjouterClient() {
 			</fieldset>
 			</form>';
 }
-function affModifierClient($client,$idMecanicien=null,$jour=null) {
+function affModifierClient($client, $idMecanicien = null, $jour = null) {
 	$contenuAffichage = '<form method="post" action="index.php">
 			<fieldset>
 			<legend>Modifier client</legend>
 			<input type="hidden" name="idClient" value="' . $client->id . '" />
-					<input type="hidden" value="'.$idMecanicien.'" name ="idMecanicien"/>
-					<input type="hidden" value="'.$jour.'" name="jour" />
+					<input type="hidden" value="' . $idMecanicien . '" name ="idMecanicien"/>
+					<input type="hidden" value="' . $jour . '" name="jour" />
 			<p><label>Nom :</label><input type="text" name="nom" value="' . $client->nom . '"  required/><label>Prénom :</label><input type="text" name="prenom" value="' . $client->prenom . '" required/><label>Date de naissance :</label><input type="text" name="naissance" value="' . $client->date_naissance . '" placeholder="aaaa-mm-jj"  pattern="^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$" required /><label>Adresse :</label><input type="text" name="adresse" value="' . $client->adresse . '" required/><label>Numéro de téléphone :</label><input type="tel" name="num" pattern="^[0-9]{10}$" value="' . $client->num_tel . '" required/><label>Crédit :</label><input type="number" name="credit" min="0" step="0.01" value="' . $client->credit . '" required/></p>
 			<p><input type="submit" value="Modifier" name="modifier_client"/></p>
 					</fieldset>
 			</form>';
 	return $contenuAffichage;
 }
-function affPlanificationIntervention($types,$idMecanicien,$idClient,$jour){
-	$contenuAffichage='<form method="post" action="index.php">
+function affPlanificationIntervention($types, $idMecanicien, $idClient, $jour) {
+	$contenuAffichage = '<form method="post" action="index.php">
 			<fieldset>
 			<legend>Programmer une intervention</legend>
-			<input type="hidden" name="idMecanicien" value="'.$idMecanicien.'"/>
-			<input type="hidden" name="idClient" value="'.$idClient.'"/>
-					<input type="hidden" name="jour" value="'.$jour.'"/>
-	<p><label>Type d\'intervention :</label><select name="type" ';
+			<input type="hidden" name="idMecanicien" value="' . $idMecanicien . '"/>
+			<input type="hidden" name="idClient" value="' . $idClient . '"/>
+					<input type="hidden" name="jour" value="' . $jour . '"/>
+	<p><label>Type d\'intervention :</label><select name="type" >';
 	foreach ( $types as $type ) {
 		$contenuAffichage .= '<option value="' . $type->id . '" >' . $type->type . '</option>';
 	}
 	$contenuAffichage .= '</select>
 			<label>Date :</label><input type="text" name="date" placeholder="aaaa-mm-jj"  pattern="^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$" required/><label>Heure :</label><input type="number" min="0" 
 															23" step="1" name="heure" required></p>
-			<p><input type="submit" value="Programmer" name="planifier_intervention"/></p>';
+			<p><input type="submit" value="Programmer" name="planifier_intervention"/></p>
+			</fieldset></form>';
 	return $contenuAffichage;
 }
-function affRechercheClient($clients,$idMecanicien=null,$jour=null) {
+function affRechercheClient($clients, $idMecanicien = null, $jour = null) {
 	$contenuAffichage = '<form method="post" action="index.php">
 						<fieldset>
 						<legend>Consulter client</legend>
 			<p><label>Nom :</label>
-			<input type="hidden" value="'.$idMecanicien.'" name ="idMecanicien"/>
-					<input type="hidden" value="'.$jour.'" name="jour" />
+			<input type="hidden" value="' . $idMecanicien . '" name ="idMecanicien"/>
+					<input type="hidden" value="' . $jour . '" name="jour" />
 			<input list="nom" name="nom" required/>
 				<label>Prénom :</label>
 			<input list="prenom" name="prenom" required/>
@@ -296,6 +305,46 @@ function affRechercheClient($clients,$idMecanicien=null,$jour=null) {
 			';
 	return $contenuAffichage;
 }
+function affPayerIntervention($interventions, $jour, $idMecanicien, $idClient) {
+	$contenuAffichage = '<form method="post" action="index.php">
+						<fieldset>
+						<legend>Payer intervention</legend>
+			<input type="hidden" name="idMecanicien" value="' . $idMecanicien . '"/>
+			<input type="hidden" name="idClient" value="' . $idClient . '"/>
+					<input type="hidden" name="jour" value="' . $jour . '"/>';
+	
+	foreach ( $interventions as $intervention ) {
+		$contenuAffichage .= '<p><input type="checkbox" name="paye[]" value="' . $intervention->id . '"><label>Type :</label><input type="text" value="' . $intervention->type . '" readonly="readonly" /><label>Prix :</label><input type="text" value="' . $intervention->prix . '" readonly="readonly" /><label>Horaire :</label><input type="text" value="' . $intervention->horaire . '" readonly="readonly" />
+					</p>';
+	}
+	
+	$contenuAffichage .= '<p><input type="submit" value="Payer" name="payer_intervention"/></p>
+			</fieldset>
+			</form>';
+	return $contenuAffichage;
+}
+function affInterventionEnAttente($interventions, $jour, $idMecanicien, $idClient, $credit, $piece) {
+	$contenuAffichage = '';
+	foreach ( $interventions as $intervention ) {
+		$solde=$credit - $intervention->prix;
+		$contenuAffichage .= '<form method="post" action="index.php">
+						<fieldset>
+						<legend>En attente de payment</legend>
+				<input type="hidden" name="idMecanicien" value="' . $idMecanicien . '"/>
+			<input type="hidden" name="idClient" value="' . $idClient . '"/>
+					<input type="hidden" name="jour" value="' . $jour . '"/>
+					<input type="hidden" name="paye[]" value="' . $intervention->id . '"/>		
+							<p><label>Type :</label><input type="text" value="' . $intervention->type . '" readonly="readonly" /><label>Prix :</label><input type="text" value="' . $intervention->prix . '" readonly="readonly" /><label>Horaire :</label><input type="text" value="' . $intervention->horaire . '" readonly="readonly" />
+					' . ($solde >= 0 ? '<input type="submit" value="Différé" name="differe_intervention"/>' : '') . '<input type="submit" value="Payer" name="payer_intervention"/></p><ul>';
+		if (! empty ( $piece [$intervention->id] )) {
+			foreach ( $piece [$intervention->id] as $p ) {
+				$contenuAffichage .= '<li>' . $p->libele . '</li>';
+			}
+		}
+		$contenuAffichage .= '</ul></fieldset></form>';
+	}
+	return $contenuAffichage;
+}
 // //////////////////////////////////////////
 // ///////////////////////////////MECANICIEN
 function affichageMecanicien($mecaniciens, $edt, $jour, $id, $intervention, $client, $impayer, $interventions) {
@@ -313,12 +362,12 @@ function affichageMecanicien($mecaniciens, $edt, $jour, $id, $intervention, $cli
 	
 	require_once 'gabarit.php';
 }
-function affChoixEDT($mecaniciens, $id, $jour,$agent=FALSE,$idClient=null) {
+function affChoixEDT($mecaniciens, $id, $jour, $agent = FALSE, $idClient = null) {
 	$jour = date_create_from_format ( 'Y/m/d', $jour );
 	$contenuAffichage = '<form method="post" action="index.php">
 						<fieldset>
 						<legend>Consulter emploie du temps</legend>
-			<input type="hidden" value="'.$idClient.'" name="idClient"/>
+			<input type="hidden" value="' . $idClient . '" name="idClient"/>
 			<p><label>Nom du mecanicien :</label>
 			<select  name="idMecanicien" required/>';
 	
@@ -327,7 +376,7 @@ function affChoixEDT($mecaniciens, $id, $jour,$agent=FALSE,$idClient=null) {
 	}
 	$contenuAffichage .= '</select>
 			<label>Jour :</label><input type="text" name="jour" placeholder="aaaa-mm-jj" value="' . (! empty ( $jour ) ? date_format ( $jour, 'Y-m-d' ) : date ( 'Y-m-d' )) . '" pattern="^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$" required/></p>
-			<p><input type="submit" value="Consulter" name="consulter_employe_du_temps_mecanicien'.($agent?'_agent':'').'"/></p>
+			<p><input type="submit" value="Consulter" name="consulter_employe_du_temps_mecanicien' . ($agent ? '_agent' : '') . '"/></p>
 			</fieldset>
 			</form>
 			';
@@ -343,7 +392,7 @@ function affReservationFormation($idMecanicien, $jour) {
 							<input type="submit" value="Formation" name="bloquer_formation_mecanicien"/></form>';
 	return $contenueAffichage;
 }
-function affEDT($edt, $jour,$agent=FALSE) {
+function affEDT($edt, $jour, $agent = FALSE) {
 	$tache = 0;
 	$jour = date_create_from_format ( 'Y-m-d', $jour );
 	$jour = date_format ( $jour, 'Y-m-d' );
@@ -362,10 +411,10 @@ function affEDT($edt, $jour,$agent=FALSE) {
 				if (date ( 'Y-m-d H', strtotime ( $edt [$tache]->horaire ) ) == date ( 'Y-m-d H', strtotime ( "$rel days $h hours", $jour_ ) )) {
 					switch ($edt [$tache]->type) {
 						case 'intervention' :
-							if($agent){
-								$contenuAffichage.="Intervention";
-							}else{
-							$contenuAffichage .= '<form method="post" action="index.php">
+							if ($agent) {
+								$contenuAffichage .= "Intervention";
+							} else {
+								$contenuAffichage .= '<form method="post" action="index.php">
 									<input type="hidden" name="intervention" value="' . $edt [$tache]->id_intervention . '"/>
 													<input type="hidden" name="jour" value="' . $jour . '"/>
 							<input type="submit" value="Intervention" name="consulter_intervention_mecanicien"/></form>';
@@ -387,14 +436,18 @@ function affEDT($edt, $jour,$agent=FALSE) {
 }
 function affSyntheseClient($client, $impayer, $interventions) {
 	$client = $client [0];
-	$contenuAffichage = '<p>Nom : ' . $client->nom . ' Prénom : ' . $client->prenom . ' Date de naissance : ' . $client->date_naissance . '</br>
+	$impayer = empty ( $impayer [0]->impayer ) ? 0 : $impayer [0]->impayer;
+	$contenuAffichage='<p>Synthese client</p>';
+	$contenuAffichage .= '<p>Nom : ' . $client->nom . ' Prénom : ' . $client->prenom . ' Date de naissance : ' . $client->date_naissance . '</br>
 			Addresse : ' . $client->adresse . ' Numéro de téléphone : ' . $client->num_tel . '</br>
-					Crédit maximum : ' . $client->credit . '€ Impayer : ' . $impayer [0]->impayer . '€ Restant : ' . (intval ( $client->credit ) - intval ( $impayer [0]->impayer )) . '€</p>';
-	$contenuAffichage .= '<table><tr><th>Id</th><th>Type d\'intervention</th><th>Mecanicien</th><th>Prix</th><th>Etat</th><th>Date</th></tr>';
-	foreach ( $interventions as $intervention ) {
-		$contenuAffichage .= '<tr><th>' . $intervention->id . '</th><td>' . $intervention->type . '</td><td>' . $intervention->nom . '</td><td>' . $intervention->prix . '</td><td>' . $intervention->etat . '</td><td>' . $intervention->horaire . '</td></tr>';
+					Crédit maximum : ' . $client->credit . '€ Impayer : ' . $impayer . ' € Restant : ' . (intval ( $client->credit ) - intval ( $impayer )) . '€</p>';
+	if (! empty ( $interventions )) {
+		$contenuAffichage .= '<table><tr><th>Id</th><th>Type d\'intervention</th><th>Mecanicien</th><th>Prix</th><th>Etat</th><th>Date</th></tr>';
+		foreach ( $interventions as $intervention ) {
+			$contenuAffichage .= '<tr><th>' . $intervention->id . '</th><td>' . $intervention->type . '</td><td>' . $intervention->nom . '</td><td>' . $intervention->prix . '</td><td>' . $intervention->etat . '</td><td>' . $intervention->horaire . '</td></tr>';
+		}
+		$contenuAffichage .= '</table>';
 	}
-	$contenuAffichage .= '</table>';
 	return $contenuAffichage;
 }
 function affInterventionMecanicien($intervention) {

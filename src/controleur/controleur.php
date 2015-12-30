@@ -47,86 +47,105 @@ function ctlAffichageDirecteur() {
 	}
 	affichageDirecteur ( $employes, $mecaniciens, $pieces, $typeIntervention, $produits );
 }
-function ctlAffichageMecanicien($edt =NULL,$jour=NULL,$idMecanicien=NULL,$intervention=NULL,$client=NULL,$impayer=NULL,$interventions=NULL) {
+function ctlAffichageMecanicien($edt = NULL, $jour = NULL, $idMecanicien = NULL, $intervention = NULL, $client = NULL, $impayer = NULL, $interventions = NULL) {
 	$mecaniciens = getMecanicien ();
-	affichageMecanicien ($mecaniciens, $edt,$jour,$idMecanicien,$intervention,$client,$impayer,$interventions);
+	affichageMecanicien ( $mecaniciens, $edt, $jour, $idMecanicien, $intervention, $client, $impayer, $interventions );
 }
-function ctlAffichageAgent($client=NULL,$idMecanicien=NULL,$jour=NULL) {
-	$jour=empty($jour)?date('Y-m-d'):$jour;
-	$clients=getClients();
-	$mecaniciens=getMecanicien();
-	$types=getTypeIntervention();
-	$edt=(!empty($idMecanicien)?ctlGetEDT($idMecanicien, $jour):null);
-	if(!empty($client)){
-		$client=getInformationClient($client);
+function ctlAffichageAgent($client = NULL, $idMecanicien = NULL, $jour = NULL) {
+	$jour = empty ( $jour ) ? date ( 'Y-m-d' ) : $jour;
+	$clients = getClients ();
+	$mecaniciens = getMecanicien ();
+	$types = getTypeIntervention ();
+	$edt = (! empty ( $idMecanicien ) ? ctlGetEDT ( $idMecanicien, $jour ) : null);
+	$facture = empty ( $client ) ? null : getInterventionClientEtat ( $client, 'en différé' );
+	$attente = empty ( $client ) ? null : getInterventionClientEtat ( $client, 'en attente de payment' );
+	$payer=empty($client)?null:getInterventionClientEtat($client, 'payée');
+	$piece = null;
+	if (! empty ( $attente )) {
+		foreach ( $attente as $val ) {
+			$piece [$val->id] = getMaterielIntervention ( $val->id );
+		}
 	}
-	affichageAgent ($clients,$client,$mecaniciens,$idMecanicien,$jour,$edt,$types);
-}
-///////////////////////////AGENT/////////////////////
-function ctlAjouterClient($nom,$prenom,$dateN,$adresse,$num,$credit){
-	$d=explode('-', $dateN);
-	if(checkdate($d[1], $d[2], $d[0])){
-		ajouterClient($nom, $prenom, $adresse, $num, $dateN,$credit);
+	$impaye = empty ( $client ) ? null : getSommeImpayer ( $client );
+	if (! empty ( $client )) {
+		$client = getInformationClient ( $client );
+		
 	}
-	ctlAffichageAgent();
+	affichageAgent ( $clients, $client, $mecaniciens, $idMecanicien, $jour, $edt, $types, $facture, $attente, $piece, $impaye,$payer );
 }
-
-function ctlChercherClient($nom,$prenom,$dateN,$jour=null,$idMecanicien=null){
-	$client=chercherClient($nom,$prenom,$dateN);
-	$client=empty($client)?null:$client[0]->id;
-	ctlAffichageAgent($client,$idMecanicien,$jour);
-}
-
-function ctlModifierClient($id,$nom,$prenom,$dateN,$adresse,$num,$credit,$jour,$idMecanicien){
-	$d=explode('-', $dateN);
-	if(checkdate($d[1], $d[2], $d[0])){
-		modifClient($id, $nom, $prenom, $adresse, $num, $dateN, $credit);
+// /////////////////////////AGENT/////////////////////
+function ctlAjouterClient($nom, $prenom, $dateN, $adresse, $num, $credit) {
+	$d = explode ( '-', $dateN );
+	if (checkdate ( $d [1], $d [2], $d [0] )) {
+		ajouterClient ( $nom, $prenom, $adresse, $num, $dateN, $credit );
 	}
-	ctlAffichageAgent($client,$idMecanicien,$jour);
+	ctlAffichageAgent ();
 }
-function ctlPlaniffierIntervention($idClient,$type,$idMecanicien,$date,$heure,$jour){
-	$d=explode('-', $date);
-	$horaire=$date.' '.$heure;
-	if(checkdate($d[1], $d[2], $d[0]) and empty(isDisponible($idMecanicien, $horaire))){
-		$id=ajouterIntervention($idMecanicien, $horaire, $idClient, $type);
-		ajouterInterventionEdt($idMecanicien, $id, $horaire);
+function ctlChercherClient($nom, $prenom, $dateN, $jour = null, $idMecanicien = null) {
+	$client = chercherClient ( $nom, $prenom, $dateN );
+	$client = empty ( $client ) ? null : $client [0]->id;
+	ctlAffichageAgent ( $client, $idMecanicien, $jour );
+}
+function ctlModifierClient($id, $nom, $prenom, $dateN, $adresse, $num, $credit, $jour, $idMecanicien) {
+	$d = explode ( '-', $dateN );
+	if (checkdate ( $d [1], $d [2], $d [0] )) {
+		modifClient ( $id, $nom, $prenom, $adresse, $num, $dateN, $credit );
+	}
+	ctlAffichageAgent ( $id, $idMecanicien, $jour );
+}
+function ctlDiffereIntervention($differe,$idMecanicien,$idClient,$jour){
+	foreach ($differe as $id){
+		differeFacture($id);
 	}
 	ctlAffichageAgent($idClient,$idMecanicien,$jour);
 }
+function ctlPlaniffierIntervention($idClient, $type, $idMecanicien, $date, $heure, $jour) {
+	$d = explode ( '-', $date );
+	$horaire = $date . ' ' . $heure;
+	if (checkdate ( $d [1], $d [2], $d [0] ) and empty ( isDisponible ( $idMecanicien, $horaire ) )) {
+		$id = ajouterIntervention ( $idMecanicien, $horaire, $idClient, $type );
+		ajouterInterventionEdt ( $idMecanicien, $id, $horaire );
+		nouvelleFacture ( $id, $idClient );
+	}
+	ctlAffichageAgent ( $idClient, $idMecanicien, $jour );
+}
+function ctlPayerInterventions($payer, $id_Mecanicien, $id_Client, $jour) {
+	foreach ( $payer as $id ) {
+		payerIntervention ( $id );
+	}
+	ctlAffichageAgent ( $id_Client, $id_Mecanicien, $jour );
+}
 // ///////////////////////MECANICIEN///////////////////////////////////////
 function ctlConsulterEDT($idMecanicien, $jour) {
-	$edt=(!empty($idMecanicien)?ctlGetEDT($idMecanicien, $jour):null);
-		ctlAffichageMecanicien ( $edt,$jour,$idMecanicien );	
+	$edt = (! empty ( $idMecanicien ) ? ctlGetEDT ( $idMecanicien, $jour ) : null);
+	ctlAffichageMecanicien ( $edt, $jour, $idMecanicien );
 }
-
-function ctlGetEDT($idMecanicien,$jour){
+function ctlGetEDT($idMecanicien, $jour) {
 	$jour = date_create_from_format ( 'Y-m-d', $jour );
 	$semaine = date_format ( $jour, 'W' );
 	$annee = date_format ( $jour, 'Y' );
-	return edtMecanicien ( $idMecanicien, $semaine-1, $annee );
+	return edtMecanicien ( $idMecanicien, $semaine - 1, $annee );
 }
-
-function ctlConsulterInterventionMecanicien($jour,$idIntervention){
-	$intervention=getIntervention($idIntervention);	
-	$client=getInformationClient($intervention[0]->id_client);
-	$impayer=getSommeImpayer($intervention[0]->id_client);
-	$interventions=getInterventionClient($intervention[0]->id_client);
-	$idMecanicien=$intervention[0]->id_mecanicien;
-	$edt=ctlGetEDT($idMecanicien, $jour);
-
-	ctlAffichageMecanicien($edt,$jour,$idMecanicien,$intervention,$client,$impayer,$interventions);
-}
-
-function ctlBloquerFormation($date,$heure,$jour,$idMecanicien){
-	$d=explode('-', $date);
-	$date.=' '.$heure.':00:00';
+function ctlConsulterInterventionMecanicien($jour, $idIntervention) {
+	$intervention = getIntervention ( $idIntervention );
+	$client = getInformationClient ( $intervention [0]->id_client );
+	$impayer = getSommeImpayer ( $intervention [0]->id_client );
+	$interventions = getInterventionClient ( $intervention [0]->id_client );
+	$idMecanicien = $intervention [0]->id_mecanicien;
+	$edt = ctlGetEDT ( $idMecanicien, $jour );
 	
-	if(checkdate($d[1], $d[2],$d[0] ) && empty(isDisponible($idMecanicien, $date))){
-	$id=ajouterFormation($idMecanicien, $date);
-	ajouterFormationEdt($idMecanicien, $id, $date);
+	ctlAffichageMecanicien ( $edt, $jour, $idMecanicien, $intervention, $client, $impayer, $interventions );
+}
+function ctlBloquerFormation($date, $heure, $jour, $idMecanicien) {
+	$d = explode ( '-', $date );
+	$date .= ' ' . $heure . ':00:00';
+	
+	if (checkdate ( $d [1], $d [2], $d [0] ) && empty ( isDisponible ( $idMecanicien, $date ) )) {
+		$id = ajouterFormation ( $idMecanicien, $date );
+		ajouterFormationEdt ( $idMecanicien, $id, $date );
 	}
-	$edt=ctlGetEDT($idMecanicien, $jour);
-	ctlAffichageMecanicien($edt,$jour,$idMecanicien);
+	$edt = ctlGetEDT ( $idMecanicien, $jour );
+	ctlAffichageMecanicien ( $edt, $jour, $idMecanicien );
 }
 
 // //////////////////////////////////////////////////////////////////////
@@ -273,7 +292,6 @@ function ctlSupprimerMecaniciens($supprimers) {
 	}
 	ctlAffichageDirecteur ();
 }
-
 
 // /////////////////////////////////////////////////////////////////////////
 // erreur
