@@ -53,78 +53,73 @@ elseif (isset ( $_POST ['cree_type_intervention'] )) {
 	} elseif (isset ( $_POST ['supprimer_mecanicien'] )) {
 		$supprimers = isset ( $_POST ['supprimer'] ) ? $_POST ['supprimer'] : array ();
 		ctlSupprimerMecaniciens ( $supprimers );
-	}	// ////////////////////////////////////////////////////////MECANICIEN
-	elseif (isset ( $_POST ['consulter_employe_du_temps_mecanicien'] )) {
+	} // ////////////////////////////////////////////////////////MECANICIEN
+elseif (isset ( $_POST ['consulter_employe_du_temps_mecanicien'] )) {
 		$idMecanicien = $_POST ['idMecanicien'];
 		$jour = $_POST ['jour'];
 		ctlconsulterEDT ( $idMecanicien, $jour );
 	} elseif (isset ( $_POST ['consulter_intervention_mecanicien'] )) {
 		$jour = $_POST ['jour'];
-		$intervention=$_POST['intervention'];
-		ctlConsulterInterventionMecanicien($jour,$intervention);
+		$intervention = $_POST ['intervention'];
+		ctlConsulterInterventionMecanicien ( $jour, $intervention );
 	} elseif (isset ( $_POST ['bloquer_formation_mecanicien'] )) {
 		$jour = $_POST ['jour'];
-		$date=$_POST['date'];
-		$idMecanicien=$_POST['idMecanicien'];
-		$heure=$_POST['heure'];
-		ctlBloquerFormation($date,$heure,$jour,$idMecanicien);
-	} 
-	/////////////////////AGENT
-	elseif (isset($_POST['cree_client'])){
-		$dateN=$_POST['naissance'];
-		$nom=$_POST['nom'];
-		$prenom=$_POST['prenom'];
-		$adresse=$_POST['adresse'];
-		$num=$_POST['num'];
-		$credit=$_POST['credit'];
-		ctlAjouterClient($nom, $prenom, $dateN, $adresse, $num, $credit);
-	}elseif (isset($_POST['modifier_client'])){
-		$dateN=$_POST['naissance'];
-		$nom=$_POST['nom'];
-		$prenom=$_POST['prenom'];
-		$adresse=$_POST['adresse'];
-		$numTel=$_POST['num'];
-		$credit=$_POST['credit'];
-		$id=$_POST['idClient'];
-		$jour=$_POST['jour'];
-		$idMecanicien=$_POST['idMecanicien'];
-		ctlModifierClient($id,$nom, $prenom, $dateN, $adresse, $numTel, $credit,$jour,$idMecanicien);
-	}elseif (isset($_POST['chercher_client'])){
-		$dateN=$_POST['naissance'];
-		$nom=$_POST['nom'];
-		$prenom=$_POST['prenom'];
-		$jour=$_POST['jour'];
-		$idMecanicien=$_POST['idMecanicien'];
-		ctlChercherClient($nom, $prenom, $dateN,$jour,$idMecanicien);
-	}elseif (isset ( $_POST ['consulter_employe_du_temps_mecanicien_agent'] )) {
+		$date = $_POST ['date'];
+		$idMecanicien = $_POST ['idMecanicien'];
+		$heure = $_POST ['heure'];
+		ctlBloquerFormation ( $date, $heure, $jour, $idMecanicien );
+	} // ///////////////////AGENT
+elseif (isset ( $_POST ['cree_client'] )) {
+		$dateN = $_POST ['naissance'];
+		$nom = $_POST ['nom'];
+		$prenom = $_POST ['prenom'];
+		$adresse = $_POST ['adresse'];
+		$num = $_POST ['num'];
+		$credit = $_POST ['credit'];
+		ctlAjouterClient ( $nom, $prenom, $dateN, $adresse, $num, $credit );
+	} elseif (isset ( $_POST ['modifier_client'] )) {
+		$dateN = $_POST ['naissance'];
+		$nom = $_POST ['nom'];
+		$prenom = $_POST ['prenom'];
+		$adresse = $_POST ['adresse'];
+		$numTel = $_POST ['num'];
+		$credit = $_POST ['credit'];
+		$id = $_POST ['idClient'];
+		$jour = $_POST ['jour'];
+		$idMecanicien = $_POST ['idMecanicien'];
+		ctlModifierClient ( $id, $nom, $prenom, $dateN, $adresse, $numTel, $credit, $jour, $idMecanicien );
+	} elseif (isset ( $_POST ['chercher_client'] )) {
+		$dateN = $_POST ['naissance'];
+		$nom = $_POST ['nom'];
+		$prenom = $_POST ['prenom'];
+		$jour = $_POST ['jour'];
+		$idMecanicien = $_POST ['idMecanicien'];
+		ctlChercherClient ( $nom, $prenom, $dateN, $jour, $idMecanicien );
+	} elseif (isset ( $_POST ['consulter_employe_du_temps_mecanicien_agent'] )) {
 		$idMecanicien = $_POST ['idMecanicien'];
 		$jour = $_POST ['jour'];
-		$idClient=isset($_POST['idClient'])?$_POST['idClient']:null;
-		ctlAffichageAgent($idClient ,$idMecanicien, $jour);
-	}
-		elseif (isset($_POST['planifier_intervention'])){
-			$idMecanicien = $_POST ['idMecanicien'];
-			$jour = $_POST ['jour'];
-			$idClient=isset($_POST['idClient'])?$_POST['idClient']:null;
-			$date=$_POST['date'];
-			$type=$_POST['type'];
-			$heure=$_POST['heure'];
-			ctlPlaniffierIntervention($idClient,$type,$idMecanicien,$date,$heure,$jour);
-		
-	}elseif (isset($_POST['payer_intervention'])){
-		$idClient=$_POST['idClient'];
-		$jour=$_POST['jour'];
-		$idMecanicien=$_POST['idMecanicien'];
-		$payer=$_POST['paye'];
-		ctlPayerInterventions($payer, $idMecanicien, $idClient, $jour);
-	}elseif (isset($_POST['differe_intervention'])){
-		$idClient=$_POST['idClient'];
-		$jour=$_POST['jour'];
-		$idMecanicien=$_POST['idMecanicien'];
-		$payer=$_POST['paye'];
-		
-	}
-	else {
+		$idClient = isset ( $_POST ['idClient'] ) ? $_POST ['idClient'] : null;
+		ctlAffichageAgent ( $idClient, $idMecanicien, $jour );
+	} elseif (isset ( $_POST ['planifier_intervention'] )) {
+		$idMecanicien = $_POST ['idMecanicien'];
+		$jour = $_POST ['jour'];
+		$idClient = isset ( $_POST ['idClient'] ) ? $_POST ['idClient'] : null;
+		$date = $_POST ['date'];
+		$type = $_POST ['type'];
+		$heure = $_POST ['heure'];
+		ctlPlaniffierIntervention ( $idClient, $type, $idMecanicien, $date, $heure, $jour );
+	} elseif (isset ( $_POST ['payer_intervention'] )) {
+		$idClient = $_POST ['idClient'];
+		$jour = $_POST ['jour'];
+		$idMecanicien = $_POST ['idMecanicien'];
+		$payer = $_POST ['paye'];
+		ctlPayerInterventions ( $payer, $idMecanicien, $idClient, $jour );
+	} elseif (isset ( $_POST ['differe_intervention'] )) {
+		$idClient = $_POST ['idClient'];
+		$jour = $_POST ['jour'];
+		$idMecanicien = $_POST ['idMecanicien'];
+		$payer = $_POST ['paye'];
+	} else {
 		ctlAffConnection ();
 	}
 } catch ( Exception $e ) {

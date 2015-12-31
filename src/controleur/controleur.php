@@ -59,7 +59,7 @@ function ctlAffichageAgent($client = NULL, $idMecanicien = NULL, $jour = NULL) {
 	$edt = (! empty ( $idMecanicien ) ? ctlGetEDT ( $idMecanicien, $jour ) : null);
 	$facture = empty ( $client ) ? null : getInterventionClientEtat ( $client, 'en différé' );
 	$attente = empty ( $client ) ? null : getInterventionClientEtat ( $client, 'en attente de payment' );
-	$payer=empty($client)?null:getInterventionClientEtat($client, 'payée');
+	$payer = empty ( $client ) ? null : getInterventionClientEtat ( $client, 'payée' );
 	$piece = null;
 	if (! empty ( $attente )) {
 		foreach ( $attente as $val ) {
@@ -69,9 +69,8 @@ function ctlAffichageAgent($client = NULL, $idMecanicien = NULL, $jour = NULL) {
 	$impaye = empty ( $client ) ? null : getSommeImpayer ( $client );
 	if (! empty ( $client )) {
 		$client = getInformationClient ( $client );
-		
 	}
-	affichageAgent ( $clients, $client, $mecaniciens, $idMecanicien, $jour, $edt, $types, $facture, $attente, $piece, $impaye,$payer );
+	affichageAgent ( $clients, $client, $mecaniciens, $idMecanicien, $jour, $edt, $types, $facture, $attente, $piece, $impaye, $payer );
 }
 // /////////////////////////AGENT/////////////////////
 function ctlAjouterClient($nom, $prenom, $dateN, $adresse, $num, $credit) {
@@ -93,11 +92,11 @@ function ctlModifierClient($id, $nom, $prenom, $dateN, $adresse, $num, $credit, 
 	}
 	ctlAffichageAgent ( $id, $idMecanicien, $jour );
 }
-function ctlDiffereIntervention($differe,$idMecanicien,$idClient,$jour){
-	foreach ($differe as $id){
-		differeFacture($id);
+function ctlDiffereIntervention($differe, $idMecanicien, $idClient, $jour) {
+	foreach ( $differe as $id ) {
+		differeFacture ( $id );
 	}
-	ctlAffichageAgent($idClient,$idMecanicien,$jour);
+	ctlAffichageAgent ( $idClient, $idMecanicien, $jour );
 }
 function ctlPlaniffierIntervention($idClient, $type, $idMecanicien, $date, $heure, $jour) {
 	$d = explode ( '-', $date );
@@ -122,9 +121,12 @@ function ctlConsulterEDT($idMecanicien, $jour) {
 }
 function ctlGetEDT($idMecanicien, $jour) {
 	$jour = date_create_from_format ( 'Y-m-d', $jour );
-	$semaine = date_format ( $jour, 'W' );
-	$annee = date_format ( $jour, 'Y' );
-	return edtMecanicien ( $idMecanicien, $semaine - 1, $annee );
+	$semaineA = date_format ( $jour, 'W' );
+	$anneeA = date_format ( $jour, 'Y' );
+	$jour->add ( new DateInterval ( 'P7D' ) );
+	$semaineB = date_format ( $jour, 'W' );
+	$anneeB = date_format ( $jour, 'Y' );
+	return edtMecanicien ( $idMecanicien, $semaineA - 1, $anneeA, $semaineB - 1, $anneeB );
 }
 function ctlConsulterInterventionMecanicien($jour, $idIntervention) {
 	$intervention = getIntervention ( $idIntervention );
