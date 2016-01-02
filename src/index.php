@@ -118,7 +118,8 @@ elseif (isset ( $_POST ['cree_client'] )) {
 		$idClient = $_POST ['idClient'];
 		$jour = $_POST ['jour'];
 		$idMecanicien = $_POST ['idMecanicien'];
-		$payer = $_POST ['paye'];
+		$differe = $_POST ['paye'];
+		ctlDiffereIntervention($differe, $idMecanicien, $idClient, $jour);
 	} else {
 		ctlAffConnection ();
 	}
